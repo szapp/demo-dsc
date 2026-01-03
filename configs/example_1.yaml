@@ -1,0 +1,19 @@
+defaults:
+  - my_app
+  - _self_
+
+db:
+  url:
+    drivername: "sqlite"
+    database: ":memory:"
+
+model:
+  steps:
+    preprocessing:
+      with_std: false
+      with_mean: false
+    features:
+      transformers:
+        example:
+          transformer:
+            with_std: true

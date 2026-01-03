@@ -1,0 +1,12 @@
+defaults:
+  - model/steps:
+    - default
+    - extra
+  - _self_
+
+
+model:
+  _target_: sklearn.pipeline.Pipeline
+  _convert_: object
+  steps:
+    _target_: project.entrypoints.cli.train.make_steps
