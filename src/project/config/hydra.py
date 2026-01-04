@@ -20,6 +20,8 @@ def register_base_config():
                 },
                 "loggers": {
                     "mlflow": {"handlers": [], "level": "WARNING", "propagate": True},
+                    "alembic": {"handlers": [], "level": "WARNING", "propagate": True},
+                    "sqlalchemy.engine": {"handlers": [], "propagate": True},
                 },
             },
             hydra_logging={

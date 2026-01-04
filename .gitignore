@@ -2,9 +2,12 @@
 /data/
 /outputs/
 /multirun/
+/mlruns/
 *.parquet
 *.xlsx
 *.csv
+*.duckdb
+*.db
 
 # OS files
 .DS_Store

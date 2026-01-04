@@ -3,6 +3,7 @@ import os
 from datetime import date
 from pathlib import Path
 
+import mlflow
 import sklearn
 from sklearn.pipeline import Pipeline
 from sqlalchemy import Engine
@@ -12,7 +13,7 @@ from ..data.load import fetch_data
 logger = logging.getLogger(__name__)
 
 
-@sklearn.config_context(transform_output="polars")
+@sklearn.config_context(transform_output="pandas")
 def train(model: Pipeline, db: Engine, dev: bool = True) -> float:
     """Train a model
 
@@ -25,6 +26,7 @@ def train(model: Pipeline, db: Engine, dev: bool = True) -> float:
         The score of the evaluated fit.
     """
     logger.info(f"Arguments: {dev=!s}")
+    mlflow.sklearn.autolog()
 
     X, y = fetch_data(db, date.today())
 
