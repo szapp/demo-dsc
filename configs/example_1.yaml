@@ -1,5 +1,5 @@
 defaults:
-  - my_app
+  - train_cli
   - _self_
 
 db:

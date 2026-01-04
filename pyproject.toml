@@ -3,9 +3,14 @@ name = "project"
 version = "0"
 requires-python = "==3.13.*"
 dependencies = [
+    "hydra-colorlog>=1.2.0",
     "hydra-core>=1.3.2",
+    "hydra-joblib-launcher>=1.2.0",
+    "hydra-optuna-sweeper>=1.2.0",
     "hydra-zen>=0.16.0",
+    "mlflow>=3.8.1",
     "pandera[polars]>=0.27.1",
+    "pip>=25.3",
     "polars>=1.36.1",
     "scikit-learn>=1.8.0",
     "sqlalchemy>=2.0.45",
@@ -22,13 +27,17 @@ dev = [
 ]
 
 [project.scripts]
-project = "project.entrypoints.cli.train:main"
-old = "project.entrypoints.cli.old_basic:main"
-example = "project.entrypoints.cli.example:main"
+project = "project.entrypoints.cli_pkg.train:main"
 
 [build-system]
 requires = ["uv_build"]
 build-backend = "uv_build"
+
+[tool.uv]
+override-dependencies = [
+    "optuna>=2.10.0",
+    "sqlalchemy>=1.3.0"
+]
 
 [tool.ruff]
 line-length = 88

@@ -1,0 +1,5 @@
+_target_: sklearn.pipeline.Pipeline
+_convert_: object
+steps:
+  _target_: project.entrypoints.cli.make_steps_
+  regressor: ???
