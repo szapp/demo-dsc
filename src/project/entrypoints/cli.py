@@ -28,7 +28,7 @@ def train(model: Pipeline, db: Engine, dev: bool = True) -> float:
     logger.info(f"Arguments: {dev=!s}")
     mlflow.sklearn.autolog()
 
-    X, y = fetch_data(db, date.today())
+    X, y = fetch_data(db, start_date=date(2026, 1, 1))
 
     model.fit(X, y)
 

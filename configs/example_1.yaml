@@ -9,9 +9,6 @@ db:
 
 model:
   steps:
-    preprocessing:
-      with_std: false
-      with_mean: false
     features:
       transformers:
         example:

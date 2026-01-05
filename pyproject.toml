@@ -8,6 +8,7 @@ dependencies = [
     "hydra-joblib-launcher>=1.2.0",
     "hydra-optuna-sweeper>=1.2.0",
     "hydra-zen>=0.16.0",
+    "joblib>=1.5.3",
     "mlflow>=3.8.1",
     "pandas>=2.3.3",
     "pandera[pandas]>=0.27.1",

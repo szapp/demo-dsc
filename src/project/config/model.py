@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 from .util import builds, make_columns, make_steps
 
 # Preprocessing step
-preprocessing = builds(StandardScaler, with_mean=False)
+preprocessing = None
 
 # Feature engineering
 features = builds(
@@ -21,6 +21,19 @@ features = builds(
     verbose_feature_names_out=False,
 )
 
+# Feature selection
+feature_selection = builds(
+    ColumnTransformer,
+    transformers=make_columns(
+        passthrough=dict(
+            transformer="passthrough",
+            columns=["col1", "col2"],
+        ),
+    ),
+    remainder="drop",
+    verbose_feature_names_out=False,
+)
+
 # Final predictor
 regressor = builds(RandomForestRegressor, random_state=42)
 
@@ -30,6 +43,7 @@ model = builds(
     steps=make_steps(
         preprocessing=preprocessing,
         features=features,
+        feature_selection=feature_selection,
         regressor=regressor,
     ),
 )
