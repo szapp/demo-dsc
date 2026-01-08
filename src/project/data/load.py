@@ -1,19 +1,24 @@
 import glob
 import hashlib
+import logging
 from dataclasses import dataclass, field
 from datetime import date
-from functools import partial
 from pathlib import Path
+from time import time
 from typing import Self
 
 import pandas as pd
 from joblib import Memory
 from sqlalchemy import Engine, text
 
+from .model import RawDataModel
+
+logger = logging.getLogger(__name__)
 PATH_SQL_PATTERN = Path(__file__).parent / "sql" / "*.sql"
 PATH_CACHE = Path(__file__).parent / ".cache"  # TODO adjust the path
+CACHE_SEC = 60 * 60 * 6  # 6 hours as seconds
 memory = Memory(location=PATH_CACHE, verbose=0)
-cache = partial(memory.cache, cache_validation_callback=lambda x: True)
+cache = memory.cache(cache_validation_callback=lambda x: time() - x["time"] < CACHE_SEC)
 
 
 @dataclass(frozen=True)
@@ -56,14 +61,19 @@ def fetch_data(
         end_date: End date of data.
 
     Returns:
-        Collected data from all sources.
+        X: Collected features from all sources.
+        y: Target columns.
     """
+    logger.info("Fetch data.")
     params = dict(start_date=start_date, end_date=end_date, **params)
     dfs = (
         pd.read_sql(text(q), db, index_col="date", params=params, parse_dates=["date"])
         for q in sql_queries
     )
-    df = pd.DataFrame(index=pd.date_range(start_date, end_date))
-    X = df.join(dfs, validate="1:1").reset_index()
+    df = pd.DataFrame(index=pd.date_range(start_date, end_date, name="date"))
+    df = df.join(dfs, validate="1:1").reset_index()
+
+    X = RawDataModel.validate(df)
     y = X.pop("target")
+
     return X, y

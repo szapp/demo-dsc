@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Start entryproint",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "project",
+            "args": [
+                "--config-name",
+                "example_1.yaml",
+            ],
+            // "console": "integratedTerminal",
+            // "cwd": "${workspaceFolder}",
+            // "env": {
+            //     "PYTHONUNBUFFERED": "1"
+            // }
+        }
+    ]
+}
