@@ -40,6 +40,7 @@ def train(model: Pipeline, db: Engine, dev: bool = True) -> float:
 def main():
     import optuna.logging  # noqa: F401 - Import early to suppress rogue logging
     from hydra_zen import store, zen
+    from hydra_zen.third_party.pydantic import pydantic_parser
 
     from ..config import db, model, register_base_config
 
@@ -50,4 +51,5 @@ def main():
     store(train, name="train_cli", db=db, model=model, dev=dev)
     store.add_to_hydra_store()
 
-    zen(train).hydra_main(config_path, config_name="train_cli", version_base=None)
+    entrypoint = zen(train, instantiation_wrapper=pydantic_parser)
+    entrypoint.hydra_main(config_path, config_name="train_cli", version_base=None)

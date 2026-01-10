@@ -4,6 +4,6 @@ __all__ = [
     "register_base_config",
 ]
 
-from .db import db
-from .hydra import register_base_config
-from .model import model
+from .db_store import db
+from .hydra_store import register_base_config
+from .model_store import model
