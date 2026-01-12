@@ -5,5 +5,6 @@ hydra:
   sweeper:
     params:
       model.steps.regressor.n_estimators: 'choice(10, 50, 100, 500)'
-    n_trials: 4
-    n_jobs: 4
+      model.steps.feature_selection.transformers.passthrough.columns.col1: 'choice(true, false)'
+    n_trials: 8
+    n_jobs: 8

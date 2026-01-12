@@ -13,6 +13,7 @@ dependencies = [
     "pandas>=2.3.3",
     "pandera[pandas]>=0.27.1",
     "pip>=25.3",
+    "python-dotenv>=1.2.1",
     "scikit-learn>=1.8.0",
     "sqlalchemy>=2.0.45",
 ]

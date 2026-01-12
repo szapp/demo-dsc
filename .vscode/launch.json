@@ -12,7 +12,7 @@
                 "PYTHONUNBUFFERED": "1"
             },
             "windows": {
-                "program": "${workspaceFolder}/.venv/Script/project"
+                "program": "${workspaceFolder}/.venv/Script/project.exe"
             }
         }
     ],
