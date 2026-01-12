@@ -19,8 +19,8 @@ db_store(
     url=builds(
         sqlalchemy.URL.create,
         drivername="postgresql+psycopg2",
-        username="${os.env:DB_PROD_USERNAME}",
-        password="${os.env:DB_PROD_PASSWORD}",
+        username="${oc.env:DB_PROD_USERNAME}",
+        password="${oc.env:DB_PROD_PASSWORD}",
         host="localhost",
         port="5432",
         database="mydb",

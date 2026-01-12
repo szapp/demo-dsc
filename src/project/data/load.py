@@ -1,11 +1,13 @@
 import glob
 import hashlib
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
+from functools import wraps
 from pathlib import Path
 from time import time
-from typing import Self
+from typing import ParamSpec, Self, TypeVar
 
 import pandas as pd
 from joblib import Memory
@@ -19,6 +21,19 @@ PATH_CACHE = Path(__file__).parent / ".cache"  # TODO adjust the path
 CACHE_SEC = 60 * 60 * 6  # 6 hours as seconds
 memory = Memory(location=PATH_CACHE, verbose=0)
 cache = memory.cache(cache_validation_callback=lambda x: time() - x["time"] < CACHE_SEC)
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def typed_cache(func: Callable[P, R]) -> Callable[P, R]:
+    """Allows cached functions to be recognized by pydantic."""
+
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
 @dataclass(frozen=True)
@@ -44,12 +59,13 @@ class QueryLoader(tuple):
         return cls(items=queries)
 
 
-@cache(ignore=["db"])
+@typed_cache
+@cache(ignore=["db_engine"])
 def fetch_data(
-    db: Engine,
+    start_date: date,
+    end_date: date,
+    db_engine: Engine,
     sql_queries: tuple[str, ...] = QueryLoader.from_files(),
-    start_date: date = date(2020, 1, 1),
-    end_date: date = date.today(),
     **params: str | int | float | date,
 ) -> tuple[pd.DataFrame, pd.Series]:
     """Fetch all data from the database based on multiple date-bound SQL queries.
@@ -67,7 +83,9 @@ def fetch_data(
     logger.info("Fetch data.")
     params = dict(start_date=start_date, end_date=end_date, **params)
     dfs = (
-        pd.read_sql(text(q), db, index_col="date", params=params, parse_dates=["date"])
+        pd.read_sql(
+            text(q), db_engine, index_col="date", params=params, parse_dates=["date"]
+        )
         for q in sql_queries
     )
     df = pd.DataFrame(index=pd.date_range(start_date, end_date, name="date"))
