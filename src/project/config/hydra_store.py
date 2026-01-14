@@ -27,7 +27,6 @@ hydra_store(
                 "mlflow": {"handlers": [], "level": "WARNING", "propagate": True},
                 "mlflow.types.type_hints": {"level": "ERROR"},
                 "alembic": {"handlers": [], "level": "WARNING", "propagate": True},
-                "__name__": {"level": "WARNING"},  # Alembic plugins.py
                 "sqlalchemy.engine": {"handlers": [], "propagate": True},
             },
             "root": {
