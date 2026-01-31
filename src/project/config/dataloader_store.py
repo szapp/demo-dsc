@@ -11,7 +11,7 @@ dataloader_store(
     db_engine=None,
     hydra_defaults=[
         "_self_",
-        {"/db@db_engine": "prod"},
+        {"/db@db_engine": "memory"},
     ],
     name="prod",
 )

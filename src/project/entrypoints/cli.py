@@ -45,8 +45,10 @@ def train(
     """Train a model
 
     Args:
+        dataloader: Function to produce data given the dates.
+        start_date: Starting date of data.
+        end_date: End date of the data.
         model: Scikit-Learn ML pipeline.
-        db: SQLAlchemy database engine.
         evaluate: Perform K-fold cross-validation.
 
     Returns:
