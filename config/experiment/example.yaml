@@ -1,0 +1,18 @@
+# @package _global_
+
+defaults:
+  - override /hydra/sweeper: optuna
+
+exp_name: example
+hydra:
+  mode: MULTIRUN
+  sweeper:
+    sampler:
+      seed: 42
+    direction: maximize
+    storage: sqlite:///data/optuna.db
+    params:
+      model.steps.regressor.n_estimators: "choice(10, 50, 100, 500)"
+      model.steps.feature_selection.transformers.passthrough.columns.col1: "choice(true, false)"
+    n_trials: 8
+    n_jobs: 8

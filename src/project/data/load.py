@@ -1,97 +1,106 @@
+"""Load, assemble, validate data from data base. No logic."""
+
 import glob
-import hashlib
 import logging
-from collections.abc import Callable
-from dataclasses import dataclass, field
-from datetime import date
-from functools import wraps
 from pathlib import Path
-from time import time
-from typing import ParamSpec, Self, TypeVar
 
 import pandas as pd
-from joblib import Memory
-from sqlalchemy import Engine, text
+import pandera.pandas as pa
+from frozendict import frozendict
+from sqlalchemy import Engine, TextClause, bindparam, text
 
-from .model import RawDataModel
+from ..types import SqlParam, SqlParams
+from ._cache import cache
+from .validation import RawDataModel
 
 logger = logging.getLogger(__name__)
 PATH_SQL_PATTERN = Path(__file__).parent / "sql" / "*.sql"
-PATH_CACHE = Path(__file__).parent / ".cache"  # TODO adjust the path
-CACHE_SEC = 60 * 60 * 6  # 6 hours as seconds
-memory = Memory(location=PATH_CACHE, verbose=0)
-cache = memory.cache(cache_validation_callback=lambda x: time() - x["time"] < CACHE_SEC)
-
-P = ParamSpec("P")
-R = TypeVar("R")
 
 
-def typed_cache(func: Callable[P, R]) -> Callable[P, R]:
-    """Allows cached functions to be recognized by pydantic."""
-
-    @wraps(func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        return func(*args, **kwargs)
-
-    return wrapper
-
-
-@dataclass(frozen=True)
-class QueryLoader(tuple):
-    """Cacheable SQL script loader"""
-
-    items: tuple[str, ...] = ()  # Immutable collection of queries
-    fingerprint: str = field(init=False)  # Uniquely identify the query content
-
-    def __new__(cls, items: tuple[str, ...] | None = None):
-        """Tuples are immutable so __new__ has to be used here"""
-        items = items or ()
-        obj = super().__new__(cls, items)
-        h = hashlib.sha256("".join(items).encode("utf-8")).hexdigest()
-        object.__setattr__(obj, "fingerprint", h)
-        return obj
-
-    @classmethod
-    def from_files(cls: type[Self], pattern: Path | str = PATH_SQL_PATTERN) -> Self:
-        """Create a QueryLoader from a path pattern leading to SQL files"""
-        paths = map(Path, glob.glob(str(pattern), recursive=True))
-        queries = tuple(p.read_text(encoding="utf-8") for p in paths)
-        return cls(items=queries)
-
-
-@typed_cache
-@cache(ignore=["db_engine"])
-def fetch_data(
-    start_date: date,
-    end_date: date,
-    db_engine: Engine,
-    sql_queries: tuple[str, ...] = QueryLoader.from_files(),
-    **params: str | int | float | date,
-) -> tuple[pd.DataFrame, pd.Series]:
-    """Fetch all data from the database based on multiple date-bound SQL queries.
+def load_sql_files(pattern: Path | str = PATH_SQL_PATTERN) -> frozendict[str, str]:
+    """Load sql files into name-content pairs.
 
     Args:
-        db: Database connection engine.
-        queries: Tuple of SQL queries.
-        start_date: Start date of data.
-        end_date: End date of data.
+        pattern: Glob pattern for the sql files.
 
     Returns:
-        X: Collected features from all sources.
-        y: Target columns.
+        Dictionary with file names as keys and file content as values.
     """
-    logger.info("Fetch data.")
-    params = dict(start_date=start_date, end_date=end_date, **params)
-    dfs = (
-        pd.read_sql(
-            text(q), db_engine, index_col="date", params=params, parse_dates=["date"]
-        )
-        for q in sql_queries
+    paths = map(Path, sorted(glob.glob(str(pattern), recursive=True)))
+    queries = frozendict({p.stem: p.read_text(encoding="utf-8") for p in paths})
+    return queries
+
+
+def bind_sql_params(query: str, **params: SqlParam) -> TextClause:
+    """Prepare bound SQL parameters for multi-value substitutions.
+
+    This is necessary to parameterize SQL statements like "WHERE col IN (1, 2, 3)".
+
+    Args:
+        query: SQL query with parameters as ':param'.
+        params: Key-value substitutions for parameterized query.
+
+    Returns:
+        SQL statement with selectively bound and expanded parameters.
+    """
+    stmt = text(query)
+    used = stmt._bindparams.keys()
+    bound_params = (
+        bindparam(param, expanding=isinstance(v, tuple))
+        for param, v in params.items()
+        if param in used
     )
-    df = pd.DataFrame(index=pd.date_range(start_date, end_date, name="date"))
-    df = df.join(dfs, validate="1:1").reset_index()
+    return stmt.bindparams(*bound_params)
 
-    X = RawDataModel.validate(df)
-    y = X.pop("target")
 
-    return X, y
+@cache(ignore=["db_engine"])
+def fetch_data(
+    params: SqlParams,
+    db_engine: Engine,
+    sql_queries: frozendict[str, str],
+    *,
+    data_model: type[pa.DataFrameModel] = RawDataModel,
+    force: bool = False,
+) -> pd.DataFrame:
+    """Fetch all data from the database based on index-bound SQL queries.
+
+    The `sql_queries` must contain the key "index" that queries the identifying columns.
+
+    Args:
+        params: Key-value substitutions for parameterized queries.
+        db_engine: Database connection engine.
+        sql_queries: Name-query pairs to fetch.
+        force: Purge cache (completely) and fetch freshly.
+
+    Returns:
+        DataFrame with collected data from all sources.
+
+    Notes:
+        The parameter `sql_queries` is a frozendict (immutable) to allow caching.
+    """
+    queries = dict(sql_queries)
+    date_col = ["date"]  # Any possibly appearing date-columns
+
+    # Fetch index with identifiers first
+    logger.info("Fetch index")
+    qrx = bind_sql_params(queries.pop("index"), **params)
+    index = pd.read_sql(qrx, db_engine, params=params, parse_dates=date_col)
+    identifiers = index.columns.to_list()
+    index = index.set_index(identifiers)
+
+    # Fetch and left join the feature and target columns on the identifiers
+    dfs: list[pd.DataFrame] = []
+    for name, query in queries.items():
+        logger.info(f"Fetch {name}")
+        dfs.append(
+            pd.read_sql(
+                bind_sql_params(query, **params),
+                db_engine,
+                params=params,
+                index_col=identifiers,
+                parse_dates=date_col,
+            )
+        )
+    df = index.join(dfs, validate="1:1").reset_index()
+
+    return data_model.validate(df)

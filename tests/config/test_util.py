@@ -1,0 +1,105 @@
+from typing import Any, Literal
+
+import pytest
+from inline_snapshot import snapshot
+
+from project.config.stores import util
+
+
+def test_make_steps_creates_list_of_tuples_for_valid_input():
+    """Pipeline steps need to have exactly the correct types for Scikit-learn."""
+    inputs = {
+        "step1": 123,
+        "step2": None,
+    }
+    expected = snapshot(
+        [
+            ("step1", 123),
+            ("step2", None),
+        ]
+    )
+
+    actual = util._make_steps(**inputs)
+
+    assert actual == expected
+
+
+def test_make_steps_creates_empty_list_for_empty_input():
+    """Empty steps need to be represented correctly."""
+    expected = snapshot([])
+
+    actual = util._make_steps()
+
+    assert actual == expected
+
+
+def test_make_transformers_creates_list_of_tuples_for_valid_input():
+    """ColumnTransformers require a specific set of input types."""
+    input_type = dict[str, dict[Literal["transformer", "columns"], Any]]
+    inputs: input_type = {
+        "obj1": {
+            "transformer": None,
+            "columns": [1, 2],
+        },
+        "obj2": {
+            "transformer": None,
+            "columns": "col1",
+        },
+    }
+    expected = snapshot([("obj1", None, [1, 2]), ("obj2", None, "col1")])
+
+    actual = util._make_transformers(**inputs)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "key",
+    [
+        pytest.param("transformer", id="missing_transformer"),
+        pytest.param("columns", id="missing_columns"),
+    ],
+)
+def test_make_transformers_raises_on_missing_attribute(key):
+    """ColumnTransformers must have exactly a transformer and a set of columns."""
+    input_type = dict[Literal["transformer", "columns"], Any]
+    inputs: input_type = {
+        "transformer": None,
+        "columns": [1, 2],
+    }
+    inputs.pop(key)
+
+    with pytest.raises(KeyError, match=key):
+        util._make_transformers(obj1=inputs)
+
+
+def test_make_columns_creates_ordered_list_of_column_names():
+    """Same machine learning algorithms are sensitive to feature order."""
+    expected = snapshot(["col1", "col3"])
+
+    actual = util._make_columns(col1=True, col2=False, col3=True)
+
+    assert actual == expected
+
+
+def test_make_columns_creates_ordered_list_of_column_indices():
+    """Same machine learning algorithms are sensitive to feature order."""
+    inputs = {
+        3: True,
+        2: False,
+        1: True,
+    }
+    expected = snapshot([3, 1])
+
+    actual = util._make_columns(index=inputs)
+
+    assert actual == expected
+
+
+def test_make_columns_creates_empty_list_for_no_input():
+    """For debugging one might want to select no features."""
+    expected = snapshot([])
+
+    actual = util._make_columns()
+
+    assert actual == expected

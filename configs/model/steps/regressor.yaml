@@ -1,3 +1,0 @@
-regressor:
-  _target_: sklearn.ensemble.RandomForestRegressor
-  random_state: 42

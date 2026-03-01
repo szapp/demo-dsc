@@ -1,0 +1,10 @@
+from dirty_equals import IsInstance
+from sklearn.pipeline import Pipeline
+
+from project.config import make_model
+
+
+def test_model_store_supplies_model():
+    """The make_model function returns an actual sci-kit learn pipeline object."""
+    actual = make_model("baseline")
+    assert actual == IsInstance(Pipeline)

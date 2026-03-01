@@ -1,0 +1,11 @@
+from dirty_equals import IsInstance
+from sqlalchemy import Engine
+
+from project.config import make_db_engine
+
+
+def test_db_store_supplies_engine():
+    """The make_db_engine function returns an actual SQLAlchemy Engine object."""
+    actual = make_db_engine("memory")
+    assert actual == IsInstance(Engine)
+    actual.dispose()

@@ -1,7 +1,6 @@
 import logging
 from collections.abc import Callable
 from datetime import date, timedelta
-from pathlib import Path
 from typing import cast
 
 import mlflow
@@ -14,7 +13,9 @@ from pydantic import PastDate
 from sklearn.model_selection import BaseCrossValidator, KFold, cross_validate
 from sklearn.pipeline import Pipeline
 
-from ..config import get_model, store
+from ..config import CONFIG_PATH, InitWrapper, make_model, store
+from ..data import process_data
+from ..types import SqlParams
 
 logger = logging.getLogger(__name__)
 YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
@@ -22,25 +23,34 @@ YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
 
 @sklearn.config_context(transform_output="pandas")
 @store(
-    hydra_defaults=[
-        "_self_",
-        {"dataloader": "prod"},
-        {"model": "prod"},
-        {"validator": None},
-    ],
+    name="train_prod",
+    exp_name="train_prod",
     model=None,
     validator=None,
-    zen_meta={
-        "log_level": "INFO",
-    },
-    name="train_cli",
+    hydra_defaults=["_self_", {"dataloader": "prod"}, {"model": "prod"}],
+)
+@store(
+    name="train_test",
+    exp_name="train_test",
+    model=None,
+    validator=None,
+    hydra_defaults=["_self_", {"dataloader": "prod"}, {"model": "prod"}],
+)
+@store(
+    name="train_dev",
+    exp_name="train_dev",
+    model=None,
+    validator=None,
+    hydra_defaults=["_self_", {"dataloader": "prod"}, {"model": "prod"}],
+    zen_meta={"log_level": "DEBUG"},
 )
 def train(
-    dataloader: Callable[[date, date], pd.DataFrame],
-    start_date: PastDate = cast(PastDate, "2025-11-01"),
+    dataloader: Callable[[SqlParams], pd.DataFrame],
+    start_date: PastDate = cast(PastDate, "2026-01-01"),
     end_date: PastDate = cast(PastDate, YESTERDAY),
-    model: Pipeline = get_model("prod"),
+    model: Pipeline = make_model("prod"),
     validator: BaseCrossValidator | None = KFold(),
+    exp_name: str = "dev",
 ) -> float:
     """Train a model
 
@@ -50,6 +60,7 @@ def train(
         end_date: End date of the data.
         model: Scikit-Learn ML pipeline.
         evaluate: Perform K-fold cross-validation.
+        exp_name: Name of the MLflow experiment group.
 
     Returns:
         The score of the evaluated fit.
@@ -57,17 +68,20 @@ def train(
     logger.info(f"Arguments: {start_date=!s}, {end_date=!s}")
     mlflow.sklearn.autolog()
 
-    X, y = dataloader(start_date, end_date)
+    sql_params = {"start_date": start_date, "end_date": end_date}
+    raw = dataloader(sql_params)
+    X, y = process_data(raw, "target")
 
-    if validator is None:
-        logger.info("Train on full dataset.")
-        model.fit(X, y)
-        score = model.score(X, y)
-    else:
-        logger.info(f"Run validation with {validator!s}.")
-        with mlflow.start_run(nested=True):  # type: ignore
-            results = cross_validate(model, X, y, cv=validator)
-            score = results["test_score"].mean()
+    with mlflow.start_run(run_name=exp_name):  # type: ignore
+        if validator:
+            with mlflow.start_run(nested=True):  # type: ignore
+                logger.info(f"Run validation with {validator!s}.")
+                results = cross_validate(model, X, y, cv=validator)
+                score = results["test_score"].mean()
+        else:
+            logger.info("Train on full dataset.")
+            model.fit(X, y)
+            score = model.score(X, y)
 
     logger.info(f"Score: {score}.")
     return score
@@ -78,6 +92,5 @@ def main():
 
     load_dotenv()
     store.add_to_hydra_store()
-    config_path = str(Path("configs").resolve())  # Relative to working directory
-    entrypoint = zen(train, instantiation_wrapper=pydantic_parser)
-    entrypoint.hydra_main(config_path, config_name="train_cli", version_base=None)
+    entrypoint = zen(train, instantiation_wrapper=InitWrapper(pydantic_parser))
+    entrypoint.hydra_main(CONFIG_PATH, config_name="train_dev", version_base=None)

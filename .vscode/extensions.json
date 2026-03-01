@@ -1,0 +1,21 @@
+{
+    "recommendations": [
+        // Python ecosystem
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "charliermarsh.ruff",
+        "astral-sh.ty",
+        "detachhead.dtach",
+        "kennethlove.interrogate",
+        "rohaquinlop.complexipy",
+        "ms-toolsai.datawrangler",
+        "pucelle.run-on-save",
+        // Syntax and formatting
+        "timonwong.shellcheck",
+        "DavidAnson.vscode-markdownlint",
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml",
+        "mikestead.dotenv",
+        "nefrob.vscode-just-syntax",
+    ]
+}

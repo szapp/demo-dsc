@@ -1,8 +1,9 @@
 [project]
 name = "project"
-version = "0"
-requires-python = "==3.13.*"
+version = "0" # Controlled by environment variable
+requires-python = "==3.14.*" # Controlled by .python-version
 dependencies = [
+    "frozendict>=2.4.7",
     "hydra-colorlog>=1.2.0",
     "hydra-core>=1.3.2",
     "hydra-joblib-launcher>=1.2.0",
@@ -10,37 +11,67 @@ dependencies = [
     "hydra-zen>=0.16.0",
     "joblib>=1.5.3",
     "mlflow>=3.8.1",
+    "numpy>=2.4.2",
+    "omegaconf>=2.3.0",
+    "optuna>=4.7.0",
     "pandas>=2.3.3",
     "pandera[pandas]>=0.27.1",
     "pip>=25.3",
     "psycopg2-binary>=2.9.11",
+    "pyarrow>=23.0.1",
+    "pydantic>=2.12.5",
     "python-dotenv>=1.2.1",
+    "python-json-logger>=4.0.0",
     "scikit-learn>=1.8.0",
     "sqlalchemy>=2.0.45",
 ]
 
 [dependency-groups]
 dev = [
-    "import-linter>=2.9",
+    "complexipy>=5.2.0",
+    "dirty-equals>=0.11",
+    "inline-snapshot>=0.32.2",
+    "inline-snapshot-pandas>=0.2.0",
     "interrogate>=1.7.0",
+    "prek>=0.3.3",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.1",
+    "pytest-profiling>=1.8.1",
+    "pytest-raises>=0.11",
+    "pytest-randomly>=4.0.1",
+    "pytest-sugar>=1.1.1",
+    "pytest-timeout>=2.4.0",
     "ruff>=0.14.10",
+    "tach>=0.33.3",
     "ty>=0.0.8",
+]
+notebook = [
+    "ipytest>=0.14.2",
+    "ipython!=9.10.0",
+    "ipywidgets>=8.1.8",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.8",
+    "plotly>=6.5.2",
+    "seaborn>=0.13.2",
 ]
 
 [project.scripts]
 project = "project.entrypoints.cli:main"
 
+[tool.uv]
+default-groups = [
+    "dev",
+    "notebook",
+]
+override-dependencies = [
+    "optuna>=2.10.0",
+    "sqlalchemy>=1.3.0",
+]
+
 [build-system]
 requires = ["uv_build"]
 build-backend = "uv_build"
-
-[tool.uv]
-override-dependencies = [
-    "optuna>=2.10.0",
-    "sqlalchemy>=1.3.0"
-]
 
 [tool.ruff]
 line-length = 88
@@ -48,45 +79,77 @@ line-length = 88
 [tool.ruff.lint]
 extend-select = [
     "I",     # organize-imports
+    "E501",  # line-too-long
     "UP006", # non-pep585-annotation
     "UP035", # deprecated-import
+    "D200",  # unnecessary-multiline-docstring
+    "D209",  # new-line-after-last-paragraph
+    "D210",  # surrounding-whitespace
+    "D212",  # multi-line-summary-first-line
+    "D403",  # first-word-capitalized
+    "D405",  # non-capitalized-section-name
+    "D416",  # missing-section-name-colon
 ]
+ignore = [
+    "E731", # lambda-assignment
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**/test_*.py" = ["S101"] # assert
+"**/*.ipynb" = ["B018"]            # useless-expression
 
 [tool.ruff.format]
 line-ending = "lf"
 
-[tool.importlinter]
-root_packages = ["project", "tests"]
-include_external_packages = true
-exclude_type_checking_imports = true
-
-[[tool.importlinter.contracts]]
-name = "Layered architecture"
-type = "layers"
-layers = [
-    "project.entrypoints",
-    "project.component_a | project.component_b",
-    "project.utils",
+[tool.pytest]
+norecursedirs = [
+    ".*",          # pytest default
+    "entrypoints", # Never test entrypoints!
 ]
+timeout = "180" # Alert on hanging tests
+strict_xfail = true # Error on successful tests that should fail
+addopts = [
+    "-ra",                     # More insights
+    "-vv",                     # Show parametrized test names
+    "-p",
+    "no:tach",                 # Skipping tests skews coverage
+    "--strict-markers",        # Prevent silent bugs
+    "--strict-config",         # Report errors in config
+    "--doctest-modules",       # Test code examples in doc strings
+    "--cov",                   # Report coverage by default
+    "--import-mode=importlib", # Prevent importing from local src
+]
+testpaths = ["tests", "src"] # Speed up collection; include src for doctest
 
-[[tool.importlinter.contracts]]
-name = "No IO in business logic"
-type = "protected"
-protected_modules = ["project.utils.io"]
-allowed_importers = ["project.entrypoints"]
+[tool.coverage.run]
+source = [
+    "src",
+    "tests", # Spot outdated tests
+]
+omit = [
+    "notebooks/**",
+    "src/**/entrypoints/**",
+]
+branch = true
 
-[[tool.importlinter.contracts]]
-name = "No test leakage in production code"
-type = "protected"
-protected_modules = ["tests"]
-allowed_importers = []
+[tool.coverage.report]
+fail_under = 100     # Clean coverage. Use `#pragma: no cover` to skip coverage.
+ignore_errors = true
+show_missing = true
+skip_covered = true
+skip_empty = true
+
+[tool.inline-snapshot]
+format-command = "uv run ruff check --fix-only --stdin-filename {filename} | uv run ruff format --stdin-filename {filename}"
 
 [tool.interrogate]
 omit-covered-files = true
 verbose = 2
 fail-under = 100
 whitelist-regex = ["test_.*"]
+style = "google"
 
-[tool.coverage.report]
-show_missing = true
-skip_covered = true
+[tool.complexipy]
+paths = ["src", "tests"]    # Cognitive complexity: How intuitive is a function for humans.
+max-complexity-allowed = 10
+failed = true

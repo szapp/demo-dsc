@@ -1,0 +1,63 @@
+source_roots = ["src/project"]
+exclude = [
+    "**/*__pycache__",
+    "**/*egg-info",
+    "**/docs",
+    "**/tests",
+    "**/venv",
+]
+forbid_circular_dependencies = true
+
+# Architecture layers can only import from below
+layers = [
+    "entrypoints",
+    "config",
+    "business_logic",
+]
+
+# Data can only be fetched through the interface
+[[interfaces]]
+expose = ["fetch_data", "load_sql_files", "process_data"]
+from = ["data"]
+
+# Modules in the layers
+[[modules]]
+path = "entrypoints"
+layer = "entrypoints"
+depends_on = []
+
+[[modules]]
+path = "config"
+layer = "config"
+depends_on = []
+
+[[modules]]
+path = "models"
+layer = "business_logic"
+depends_on = []
+
+[[modules]]
+path = "features"
+layer = "business_logic"
+depends_on = []
+
+[[modules]]
+path = "data"
+layer = "business_logic"
+depends_on = []
+
+# Utilities can be imported freely
+[[modules]]
+path = "types"
+utility = true
+depends_on = []
+
+[[modules]]
+path = "util"
+utility = true
+depends_on = []
+
+[[modules]]
+path = "version"
+utility = true
+depends_on = []

@@ -2,14 +2,54 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Entrypoint",
+            // Debug tests
+            "name": "Python: Debug Tests",
             "type": "debugpy",
             "request": "launch",
+            "program": "${file}",
+            "purpose": [
+                "debug-test"
+            ],
+            "console": "internalConsole",
+            "justMyCode": false,
+            "presentation": {
+                "hidden": true, // Only for tests inline
+            },
+            "env": {
+                "PYTEST_ADDOPTS": "--no-cov" // Coverage prevents debugging
+            }
+        },
+        {
+            "name": "Dev",
+            "type": "debugpy",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "justMyCode": false,
             "program": "${workspaceFolder}/.venv/bin/project",
-            "args": ["--config-name", "${input:configDefault}"],
             "cwd": "${workspaceFolder}",
             "env": {
-                "PYTHONUNBUFFERED": "1"
+                "PYTHONUNBUFFERED": "1",
+                "ENV": "dev",
+            },
+            "windows": {
+                "program": "${workspaceFolder}/.venv/Script/project.exe"
+            }
+        },
+        {
+            "name": "Experiment",
+            "type": "debugpy",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "program": "${workspaceFolder}/.venv/bin/project",
+            "args": [
+                "--config-name",
+                "${input:experiment_name}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONUNBUFFERED": "1",
+                "ENV": "dev",
             },
             "windows": {
                 "program": "${workspaceFolder}/.venv/Script/project.exe"
@@ -18,10 +58,10 @@
     ],
     "inputs": [
         {
+            "id": "experiment_name",
             "type": "promptString",
-            "id": "configDefault",
-            "description": "Specify configuration file.",
-            "default": "example_1"
+            "description": "Name of experiment configuration.",
+            "default": "example"
         }
     ]
 }

@@ -1,3 +1,0 @@
-preprocessing:
-  _target_: sklearn.preprocessing.StandardScaler
-  with_mean: False

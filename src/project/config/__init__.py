@@ -1,18 +1,20 @@
+"""Configuration for entrypoints. Must only be imported by the `entrypoints`
+subpackage.
+"""
+
 __all__ = [
-    "dataloader",
-    "db",
-    "get_model",
-    "hydra",
-    "model",
+    "CONFIG_PATH",
+    "InitWrapper",
+    "make_db_engine",
+    "make_model",
     "store",
-    "validator",
 ]
 
-from hydra_zen import store
+from pathlib import Path
 
-from .dataloader_store import dataloader_store as dataloader
-from .db_store import db_store as db
-from .hydra_store import hydra_store as hydra
-from .model_store import get_model
-from .model_store import model_store as model
-from .validator_store import validator_store as validator
+from .exception_logger import InitWrapper
+from .stores import store
+from .stores.db_store import make_db_engine
+from .stores.model_store import make_model
+
+CONFIG_PATH = str(Path("config").resolve())  # Absolute path from CWD

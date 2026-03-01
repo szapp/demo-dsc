@@ -1,6 +1,0 @@
-defaults:
-  - model/steps:
-    - preprocessing
-    - regressor
-  - model/base
-  - _self_
