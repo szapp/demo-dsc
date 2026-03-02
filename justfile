@@ -1,7 +1,3 @@
-python_version := trim(read('.python-version'))
-python_minor := replace_regex(python_version, '^(3\.[1-9]\d+).*$', '$1')
-auto := python_minor
-
 alias setup := install
 alias sync := install
 alias update := install
@@ -73,7 +69,7 @@ fresh: clean install
 
 # Upgrade python and all dependencies
 [group('lifecycle')]
-upgrade python=auto: (_upgrade_python python)
+upgrade python='3.14': (_upgrade_python python)
     uv sync --upgrade
     uv run prek auto-update --no-progress
 
@@ -83,6 +79,7 @@ upgrade python=auto: (_upgrade_python python)
     -uv python upgrade {{ python }}
     uv python find {{ python }} --show-version --no-project 1> /dev/null
     perl -i -pe 's/(^requires-python\s*=\s*)"[^"]*"/\1"=={{ python }}.*"/' pyproject.toml
+    perl -i -pe "s/(^upgrade\s*python\s*)=\s*'3\.[1-9]\d+'/\1='{{ python }}'/" "{{ justfile() }}"
     uv python pin $(uv python find {{ python }} --show-version --no-project)
 
 #######

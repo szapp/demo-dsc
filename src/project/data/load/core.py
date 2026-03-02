@@ -9,9 +9,9 @@ import pandera.pandas as pa
 from frozendict import frozendict
 from sqlalchemy import Engine, TextClause, bindparam, text
 
-from ..types import SqlParam, SqlParams
+from ...types import SqlParam, SqlParams
+from ..validate import RawDataModel
 from ._cache import cache
-from .validation import RawDataModel
 
 logger = logging.getLogger(__name__)
 PATH_SQL_PATTERN = Path(__file__).parent / "sql" / "*.sql"

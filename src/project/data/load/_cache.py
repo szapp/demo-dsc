@@ -9,7 +9,7 @@ from typing import overload
 from joblib import Memory, expires_after
 
 logger = logging.getLogger(__name__)
-PATH_CACHE = Path(__file__).parent / ".cache"
+PATH_CACHE = Path(".cache")  # CWD: Not configurable as Memory is created at import time
 memory = Memory(location=PATH_CACHE, verbose=50)
 
 

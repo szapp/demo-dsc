@@ -7,4 +7,4 @@ __all__ = [
 ]
 
 from .load import fetch_data, load_sql_files
-from .preprocess import process_data
+from .process import process_data

@@ -4,7 +4,7 @@ from unittest.mock import create_autospec
 import pytest
 from joblib.memory import FileSystemStoreBackend, Memory
 
-from project.data import _cache
+from project.data.load import _cache
 
 
 @pytest.fixture(scope="module", name="cached_func")

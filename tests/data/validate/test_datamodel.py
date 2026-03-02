@@ -3,7 +3,7 @@ import pandera.pandas as pa
 from pandera.pandas import Field as F
 from pandera.typing.pandas import Series as S
 
-from project.data.validation.base import DataModelBaseML
+from project.data.validate.base import DataModelBaseML
 
 
 class DummyModel(DataModelBaseML):

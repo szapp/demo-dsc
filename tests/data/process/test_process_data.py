@@ -1,0 +1,35 @@
+import pandas as pd
+import pandera.pandas as pa
+import pytest
+from dirty_equals import IsTuple
+from inline_snapshot import snapshot
+from pandera.errors import SchemaError
+from pandera.typing.pandas import Series as S
+
+from project.data import process_data
+
+
+class DataModelDummy(pa.DataFrameModel):
+    col1: S[pa.String]
+    target: S[pa.Int64]
+
+
+def test_process_data_raises_on_validation_error():
+    """The output of the preprocessing must be validated."""
+    inputs = pd.DataFrame({"target": [1, 2, 3]})
+
+    with pytest.raises(SchemaError):
+        process_data(inputs, "target", data_model=DataModelDummy)
+
+
+def test_process_data_validates_and_splits_input():
+    """The data needs to be split into X and y based on a target column."""
+    inputs = pd.DataFrame({"target": [5, 6, 7], "col1": ["3", "2", "1"]})
+    expected_X = snapshot({"col1": ["3", "2", "1"]})
+    expected_y = snapshot({"target": [5, 6, 7]})
+
+    actual = process_data(inputs, "target", data_model=DataModelDummy)
+
+    assert actual == IsTuple(length=2)
+    assert actual[0].to_dict("list") == expected_X
+    assert actual[1].to_frame().to_dict("list") == expected_y

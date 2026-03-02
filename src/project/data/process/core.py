@@ -1,7 +1,7 @@
 import pandas as pd
 import pandera.pandas as pa
 
-from .validation import ProcessedDataModel
+from ..validate import ProcessedDataModel
 
 
 def process_data(
