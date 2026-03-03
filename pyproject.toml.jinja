@@ -1,5 +1,5 @@
 [project]
-name = "project"
+name = "{{ package_name }}"
 version = "0" # Controlled by environment variable
 requires-python = "==3.14.*" # Controlled by .python-version
 dependencies = [
@@ -57,9 +57,9 @@ notebook = [
 ]
 
 [project.scripts]
-train = "project.entrypoints.train:cli"
-predict = "project.entrypoints.predict:cli"
-evaluate = "project.entrypoints.evaluate:cli"
+train = "{{ package_name }}.entrypoints.train:cli"
+predict = "{{ package_name }}.entrypoints.predict:cli"
+evaluate = "{{ package_name }}.entrypoints.evaluate:cli"
 
 [tool.uv]
 default-groups = [

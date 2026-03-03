@@ -10,7 +10,7 @@ from pandera.pandas import Field as F
 from pandera.typing.pandas import Series as S
 from sqlalchemy import create_engine
 
-from project.data import fetch_data
+from {{ package_name }}.data import fetch_data
 
 fetch_data_uncached = getattr(fetch_data, "__wrapped__", None) or fetch_data
 

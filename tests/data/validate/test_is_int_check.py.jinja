@@ -1,7 +1,7 @@
 import pandas as pd
 from inline_snapshot import snapshot
 
-from project.data.validate import checks
+from {{ package_name }}.data.validate import checks
 
 
 def test_is_int_checks_correctly_for_one_column_in_df():

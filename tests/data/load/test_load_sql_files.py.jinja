@@ -2,7 +2,7 @@ from pathlib import Path
 
 from inline_snapshot import snapshot
 
-from project.data import load_sql_files
+from {{ package_name }}.data import load_sql_files
 
 
 def test_load_sql_files_selectively_loads_sql_files(tmp_path: Path):

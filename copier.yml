@@ -1,0 +1,3 @@
+package_name:
+  type: str
+  help: What is the Python package name?

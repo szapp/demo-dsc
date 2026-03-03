@@ -1,7 +1,7 @@
 from dirty_equals import IsInstance
 from sqlalchemy import Engine
 
-from project.config import make_db_engine
+from {{ package_name }}.config import make_db_engine
 
 
 def test_db_store_supplies_engine():

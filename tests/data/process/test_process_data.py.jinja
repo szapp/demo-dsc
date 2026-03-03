@@ -6,7 +6,7 @@ from inline_snapshot import snapshot
 from pandera.errors import SchemaError
 from pandera.typing.pandas import Series as S
 
-from project.data import process_data
+from {{ package_name }}.data import process_data
 
 
 class DataModelDummy(pa.DataFrameModel):
