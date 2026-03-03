@@ -25,14 +25,14 @@
             "request": "launch",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "program": "${workspaceFolder}/.venv/bin/project",
+            "program": "${workspaceFolder}/.venv/bin/train",
             "cwd": "${workspaceFolder}",
             "env": {
                 "PYTHONUNBUFFERED": "1",
                 "ENV": "dev",
             },
             "windows": {
-                "program": "${workspaceFolder}/.venv/Script/project.exe"
+                "program": "${workspaceFolder}/.venv/Script/train.exe"
             }
         },
         {
@@ -41,7 +41,7 @@
             "request": "launch",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "program": "${workspaceFolder}/.venv/bin/project",
+            "program": "${workspaceFolder}/.venv/bin/train",
             "args": [
                 "--config-name",
                 "${input:experiment_name}"
@@ -52,7 +52,7 @@
                 "ENV": "dev",
             },
             "windows": {
-                "program": "${workspaceFolder}/.venv/Script/project.exe"
+                "program": "${workspaceFolder}/.venv/Script/train.exe"
             }
         }
     ],

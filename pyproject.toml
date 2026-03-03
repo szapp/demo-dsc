@@ -57,7 +57,7 @@ notebook = [
 ]
 
 [project.scripts]
-project = "project.entrypoints.cli:main"
+train = "project.entrypoints.cli:main"
 
 [tool.uv]
 default-groups = [

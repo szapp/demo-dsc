@@ -89,12 +89,12 @@ upgrade python='3.14': (_upgrade_python python)
 # Run the CLI
 [group('run')]
 run *args:
-    uv run project {{ args }}
+    uv run train {{ args }}
 
 # Run an experiment
 [group('run')]
 experiment name:
-    uv run project +experiment={{ name }}
+    uv run train +experiment={{ name }}
 
 ##########
 # CREATE #
