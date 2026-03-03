@@ -60,8 +60,8 @@ install:
 [group('lifecycle')]
 clean:
     uvx pyclean . -d all
-    -rm -rf .venv
     uvx prek uninstall --no-progress
+    -rm -rf .venv
 
 # Setup environment from scratch
 [group('lifecycle')]

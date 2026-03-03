@@ -2,4 +2,4 @@
 
 import os
 
-__version__ = version = os.environ.get("PACKAGE_VERSION", None) or "0.0.1"
+version = __version__ = os.getenv("PACKAGE_PROD_VERSION", None) or "0.0.1"
