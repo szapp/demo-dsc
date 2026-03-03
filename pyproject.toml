@@ -101,10 +101,16 @@ ignore = [
 [tool.ruff.format]
 line-ending = "lf"
 
+[tool.ty.src]
+exclude = [
+    "src/**/legacy",
+]
+
 [tool.pytest]
 norecursedirs = [
     ".*",          # pytest default
     "entrypoints", # Never test entrypoints!
+    "legacy",      # Skip legacy code
 ]
 timeout = "180" # Alert on hanging tests
 strict_xfail = true # Error on successful tests that should fail
@@ -129,6 +135,7 @@ source = [
 omit = [
     "notebooks/**",
     "src/**/entrypoints/**",
+    "src/**/legacy/**",
 ]
 branch = true
 
@@ -147,9 +154,13 @@ omit-covered-files = true
 verbose = 2
 fail-under = 100
 whitelist-regex = ["test_.*"]
+exclude = [".cache"]
 style = "google"
 
 [tool.complexipy]
-paths = ["src", "tests"]    # Cognitive complexity: How intuitive is a function for humans.
+paths = ["src", "tests"] # Cognitive complexity: How intuitive is a function for humans.
 max-complexity-allowed = 10
 failed = true
+exclude = [
+    "legacy", # No glob patterns supported
+]

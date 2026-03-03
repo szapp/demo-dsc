@@ -34,7 +34,7 @@ check-imports:
 # Check docstrings on tests
 [group('check')]
 check-testdocs:
-    uv run interrogate
+    uv run interrogate tests
 
 # Check cognitive complexity
 [group('check')]
