@@ -23,19 +23,37 @@ YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
     name="prod",
     exp_name="evaluate_prod",
     model=None,
-    hydra_defaults=["_self_", {"dataloader": "prod"}, {"model": "prod"}],
+    validator=None,
+    hydra_defaults=[
+        "_self_",
+        {"dataloader": "prod"},
+        {"model": "prod"},
+        {"validator": "5fold"},
+    ],
 )
 @store(
     name="test",
     exp_name="evaluate_test",
     model=None,
-    hydra_defaults=["_self_", {"dataloader": "prod"}, {"model": "prod"}],
+    validator=None,
+    hydra_defaults=[
+        "_self_",
+        {"dataloader": "prod"},
+        {"model": "prod"},
+        {"validator": "5fold"},
+    ],
 )
 @store(
     name="dev",
     exp_name="evaluate_dev",
     model=None,
-    hydra_defaults=["_self_", {"dataloader": "prod"}, {"model": "prod"}],
+    validator=None,
+    hydra_defaults=[
+        "_self_",
+        {"dataloader": "prod"},
+        {"model": "prod"},
+        {"validator": "5fold"},
+    ],
     zen_meta={"log_level": "DEBUG"},
 )
 def evaluate(

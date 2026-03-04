@@ -54,6 +54,7 @@ check-all: lint test typing check-imports check-testdocs check-complexity
 install:
     @-[ -d .git ] || git init
     @-cp -n .env.example .env
+    @-mkdir -p logs
     uv sync
     uv run prek install --install-hooks --overwrite --no-progress
 

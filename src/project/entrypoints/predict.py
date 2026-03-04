@@ -33,7 +33,7 @@ YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
     name="dev",
     exp_name="predict_dev",
     model=None,
-    hydra_defaults=["_self_", {"dataloader": "prod"}, {"model": "fitted"}],
+    hydra_defaults=["_self_", {"dataloader": "prod"}, {"model": "prod"}],
     zen_meta={"log_level": "DEBUG"},
 )
 def predict(
