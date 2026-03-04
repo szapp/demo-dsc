@@ -20,8 +20,8 @@ For all options the experiment is starting in the dev-environment, i.e. `ENV` is
 
 ## Create experiments
 
-Configs for new experiments are conveniently created from the command palette "Just: Run Recipe" -> "new-experiment" or from the console.
+Configs for new experiments are conveniently created from the command palette "Just: Run Recipe" -> "add-experiment" or from the console.
 
 ```sh
-just new-experiment <name>
+just add-experiment <name>
 ```

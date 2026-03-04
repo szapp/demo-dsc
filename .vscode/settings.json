@@ -1,6 +1,7 @@
 {
     "interrogate.importStrategy": "fromEnvironment",
     "interrogate.args": [],
+    "tach.importStrategy": "fromEnvironment",
     "ruff.importStrategy": "fromEnvironment",
     "ruff.configurationPreference": "editorFirst",
     "ruff.configuration": {
@@ -62,7 +63,7 @@
     "files.readonlyInclude": {
         "uv.lock": true,
         ".venv/**/*": true,
-        "**/dist**/*": true,
+        "**/dist/**/*": true,
         "notebooks/template.ipynb": true,
     },
     "files.exclude": {

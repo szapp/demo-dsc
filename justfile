@@ -52,7 +52,7 @@ check-all: lint test typing check-imports check-testdocs check-complexity
 # Bring environment up-to-date
 [group('lifecycle')]
 install:
-    @[ -d .git ] || git init
+    @-[ -d .git ] || git init
     @-cp -n .env.example .env
     uv sync
     uv run prek install --install-hooks --overwrite --no-progress
@@ -103,12 +103,12 @@ experiment name:
 
 # Create a new analysis notebook
 [group('create')]
-new-notebook name:
+add-notebook name:
     cp -i notebooks/template.ipynb notebooks/{{ name }}.ipynb
     code notebooks/{{ name }}.ipynb
 
 # Create an experiment config
 [group('create')]
-new-experiment name:
+add-experiment name:
     printf "# @package _global_\n\nexp_name: {{ name }}\n" > config/experiment/{{ name }}.yaml
     code -g config/experiment/{{ name }}.yaml:3:11

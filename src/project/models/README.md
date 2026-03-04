@@ -1,5 +1,5 @@
 # Model Code
 
-This subpack contains custom definitions for modelling, e.g. Scikit-Learn predictor class or meta-estimators.
+This subpackage contains custom definitions for modelling, e.g. Scikit-Learn predictor classes or meta-estimators.
 
 Functions for training, evaluation, and inference, however, reside in the entrypoint-package.

@@ -43,8 +43,7 @@
             "justMyCode": false,
             "program": "${workspaceFolder}/.venv/bin/train",
             "args": [
-                "--config-name",
-                "${input:experiment_name}"
+                "+experimtent=${input:experiment_name}"
             ],
             "cwd": "${workspaceFolder}",
             "env": {

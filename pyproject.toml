@@ -75,6 +75,9 @@ build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 88
+extend-exclude = [
+    "src/**/legacy", # Skip legacy code
+]
 
 [tool.ruff.lint]
 extend-select = [
@@ -103,7 +106,7 @@ line-ending = "lf"
 
 [tool.ty.src]
 exclude = [
-    "src/**/legacy",
+    "src/**/legacy", # Skip legacy code
 ]
 
 [tool.pytest]
@@ -162,5 +165,9 @@ paths = ["src", "tests"] # Cognitive complexity: How intuitive is a function for
 max-complexity-allowed = 10
 failed = true
 exclude = [
-    "legacy", # No glob patterns supported
+    "project/data/legacy",        # No glob patterns supported
+    "project/entrypoints/legacy",
+    "project/features/legacy",
+    "project/models/legacy",
+    "project/util/legacy",
 ]
