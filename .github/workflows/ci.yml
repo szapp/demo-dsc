@@ -8,6 +8,11 @@ on:
     branches:
       - main
 
+env:
+  UV_LOCKED: "true"
+  UV_NO_DEFAULT_GROUPS: "true"
+  UV_DEV: "true"
+
 jobs:
   ci:
     name: Lint and test
@@ -28,7 +33,7 @@ jobs:
             enable-cache: true
 
       - name: Install the project
-        run: uv sync --locked --no-default-groups --dev
+        run: uv sync
 
       - name: Lint
         run: uv run ruff check --output-format=github .
@@ -49,7 +54,7 @@ jobs:
         run: uv run complexipy
 
       - name: Test
-        run: uv run pytest --junitxml=junit/test-results.xml
+        run: uv run pytest --inline-snapshot=disable --junitxml=junit/test-results.xml
 
       - name: Upload pytest test results
         uses: actions/upload-artifact@v4
