@@ -87,15 +87,20 @@ upgrade python='3.14': (_upgrade_python python)
 # RUN #
 #######
 
-# Run the CLI
+# Run default model training
 [group('run')]
-run *args:
+train *args:
     uv run train {{ args }}
+
+# Run default model inference
+[group('run')]
+predict *args:
+    uv run predict {{ args }}
 
 # Run an experiment
 [group('run')]
 experiment name:
-    uv run train +experiment={{ name }}
+    uv run evaluate +experiment={{ name }}
 
 ##########
 # CREATE #

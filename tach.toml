@@ -22,7 +22,7 @@ from = ["data"]
 
 # Modules in the layers
 [[modules]]
-path = "entrypoints"
+path = "entrypoints/**"
 layer = "entrypoints"
 depends_on = []
 

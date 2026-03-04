@@ -5,7 +5,7 @@ from dirty_equals import Contains
 from hydra_zen.third_party.pydantic import pydantic_parser
 from inline_snapshot import snapshot
 
-from project.config import InitWrapper
+from project.config.exception_logger import InitWrapper
 
 
 def raise_error(inputs: int = 0):

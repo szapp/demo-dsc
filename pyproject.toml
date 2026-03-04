@@ -57,7 +57,9 @@ notebook = [
 ]
 
 [project.scripts]
-train = "project.entrypoints.cli:main"
+train = "project.entrypoints.train:cli"
+predict = "project.entrypoints.predict:cli"
+evaluate = "project.entrypoints.evaluate:cli"
 
 [tool.uv]
 default-groups = [
