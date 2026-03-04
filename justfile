@@ -52,6 +52,7 @@ check-all: lint test typing check-imports check-testdocs check-complexity
 # Bring environment up-to-date
 [group('lifecycle')]
 install:
+    @[ -d .git ] || git init
     @-cp -n .env.example .env
     uv sync
     uv run prek install --install-hooks --overwrite --no-progress
