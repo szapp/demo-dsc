@@ -1,3 +1,5 @@
+export ENV := "dev"
+
 alias setup := install
 alias sync := install
 alias update := install

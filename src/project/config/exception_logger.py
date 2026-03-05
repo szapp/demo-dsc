@@ -2,6 +2,8 @@ import logging
 import sys
 from collections.abc import Callable
 
+from tqdm.contrib.logging import logging_redirect_tqdm
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,7 +28,8 @@ class InitWrapper[**P, R]:
         def exception_logger(*args: P.args, **kwargs: P.kwargs) -> R:
             """Wraps around the initialized functions and catches exceptions."""
             try:
-                return func(*args, **kwargs)
+                with logging_redirect_tqdm():
+                    return func(*args, **kwargs)
             except KeyboardInterrupt:
                 logger.error("Interrupted by user.")
                 sys.exit(130)  # Standard exit code for KeyboardInterrupt

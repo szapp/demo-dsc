@@ -24,6 +24,7 @@ dependencies = [
     "python-json-logger>=4.0.0",
     "scikit-learn>=1.8.0",
     "sqlalchemy>=2.0.45",
+    "tqdm>=4.67.3",
 ]
 
 [dependency-groups]
