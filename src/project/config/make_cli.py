@@ -1,3 +1,4 @@
+import os
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -13,14 +14,16 @@ CONFIG_PATH = str(Path("config").resolve())  # Absolute path from CWD
 
 
 def make_cli(func: Callable[..., Any]) -> Callable[[], None]:  # pragma: no cover
-    """Makes a function into a function Hydra-Zen CLI."""
+    """Make a function run with Hydra-Zen CLI."""
 
     def cli() -> None:
         import optuna.logging  # noqa: F401 - Import here to suppress rogue logging
 
         load_dotenv()
+        config_name = os.environ.get("ENV") or "dev"
+        config_path = "." if config_name in {"test", "prod"} else CONFIG_PATH
         store.add_to_hydra_store()
         entrypoint = zen(func, instantiation_wrapper=InitWrapper(pydantic_parser))
-        entrypoint.hydra_main(CONFIG_PATH, config_name="dev", version_base=None)
+        entrypoint.hydra_main(config_path, config_name, version_base=None)
 
     return cli

@@ -64,6 +64,7 @@
         "uv.lock": true,
         ".venv/**/*": true,
         "**/dist/**/*": true,
+        ".python-version": true,
         "notebooks/template.ipynb": true,
     },
     "files.exclude": {

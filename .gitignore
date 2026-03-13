@@ -3,6 +3,7 @@
 /outputs/
 /multirun/
 /mlruns/
+/mlartifacts/
 *.parquet
 *.xls[xm]
 *.csv

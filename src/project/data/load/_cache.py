@@ -1,56 +1,58 @@
 """Logic for data caching with Joblib."""
 
 import logging
+import os
 from collections.abc import Callable
-from functools import wraps
-from pathlib import Path
-from typing import overload
+from typing import Protocol, cast, overload
 
 from joblib import Memory, expires_after
+from joblib.memory import MemorizedFunc
 
+ENV_VAR_CACHE_DIR = "JOBLIB_CACHE_DIR"
+DEFAULT_CACHE_DIR = f"~{os.sep}.cache"  # Joblib resolves the path automatically
+PATH_CACHE_DIR = os.environ.get(ENV_VAR_CACHE_DIR) or DEFAULT_CACHE_DIR
+memory = Memory(location=PATH_CACHE_DIR, verbose=0)
 logger = logging.getLogger(__name__)
-PATH_CACHE = Path(".cache").resolve()  # CWD: Not configurable, created at import time
-memory = Memory(location=PATH_CACHE, verbose=0)
+
+
+class CachedFunc[**P, R](Protocol):
+    @property
+    def cache(self) -> MemorizedFunc: ...
+    def uncached(self, *args: P.args, **kwargs: P.kwargs) -> R: ...
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R: ...
+    def clear(self) -> None: ...
 
 
 @overload
-def cache[**P, R](func: Callable[P, R]) -> Callable[P, R]: ...
+def cache[**P, R](func: Callable[P, R]) -> CachedFunc[P, R]: ...
 
 
 @overload
-def cache[**P, R](**joblib_kwargs) -> Callable[[Callable[P, R]], Callable[P, R]]: ...
+def cache[**P, R](**joblib_kwargs) -> Callable[[Callable[P, R]], CachedFunc[P, R]]: ...
 
 
 def cache[**P, R](
-    func=None, _instance: Memory = memory, **joblib_kwargs
-) -> Callable[[Callable[P, R]], Callable[P, R]]:
-    """Typed cache decorator version of joblib.memory to work with pydantic.
+    func: Callable[P, R] | None = None, _instance: Memory = memory, **joblib_kwargs
+) -> CachedFunc[P, R] | Callable[[Callable[P, R]], CachedFunc[P, R]]:
+    """Typed cache decorator version of joblib.memory to work with pydantic."""
 
-    Additionally this version safely allows to force-recompute and sets an expiry
-    callback if not already set. The function to be cached requires the boolean keyword
-    argument `force=False`.
-    """
-
-    def inner[**P, R](func: Callable[P, R]) -> Callable[P, R]:
+    def create_cache(func: Callable[P, R]) -> CachedFunc[P, R]:
         # Add callback for expiry
         joblib_kwargs.setdefault("cache_validation_callback", expires_after(hours=6))
         cached_func = _instance.cache(func, **joblib_kwargs)
 
-        @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            if kwargs.pop("force", False):
-                # Clear cache on force
-                name = f"{cached_func.func.__module__}.{cached_func.func.__qualname__}"
-                logger.info(f"Purge cache of {name} and force recompute.")
-                cached_func.clear(warn=False)
+            """Pydantic does not support objects, only functions, so wrap it."""
             return cached_func(*args, **kwargs)
 
-        # Keep reference to MemorizedFunc
-        setattr(wrapper, "__memorized_func__", cached_func)
+        # Keep references accessible
+        setattr(wrapper, "cache", cached_func)
+        setattr(wrapper, "uncached", cached_func.func)
+        setattr(wrapper, "clear", cached_func.clear)
 
-        return wrapper
+        return cast(CachedFunc[P, R], wrapper)
 
     if func is not None:  # pragma: no cover
-        return inner(func)
+        return create_cache(func)
 
-    return inner
+    return create_cache

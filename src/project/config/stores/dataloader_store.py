@@ -1,14 +1,13 @@
 """Config store for data loaders (data sources)."""
 
-__all__ = []  # No exports. Use the global store
-
 from hydra_zen import store
 
 from ... import data
 from .util import builds
 
-dataloader_store = store(group="dataloader")
+__all__ = []  # No exports. Use the global store
 
+dataloader_store = store(group="dataloader")
 
 # Production data
 dataloader_store(

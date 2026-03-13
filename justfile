@@ -1,5 +1,3 @@
-export ENV := "dev"
-
 alias setup := install
 alias sync := install
 alias update := install
@@ -105,18 +103,23 @@ predict *args:
 experiment name:
     uv run evaluate +experiment={{ name }}
 
-##########
-# CREATE #
-##########
+###############
+# DEVELOPMENT #
+###############
+
+# Run local mlflow server
+[group('development')]
+mlflow:
+    uv run mlflow ui
 
 # Create a new analysis notebook
-[group('create')]
+[group('development')]
 add-notebook name:
     cp -i notebooks/template.ipynb notebooks/{{ name }}.ipynb
     code notebooks/{{ name }}.ipynb
 
 # Create an experiment config
-[group('create')]
+[group('development')]
 add-experiment name:
     printf "# @package _global_\n\nexp_name: {{ name }}\n" > config/experiment/{{ name }}.yaml
     code -g config/experiment/{{ name }}.yaml:3:11

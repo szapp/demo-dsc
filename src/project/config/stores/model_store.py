@@ -1,9 +1,5 @@
 """Config store for ML models."""
 
-__all__ = [
-    "make_model",
-]
-
 from hydra_zen import instantiate, store
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestRegressor
@@ -12,6 +8,10 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from .util import build_columns, build_steps, build_transformers, builds
+
+__all__ = [
+    "make_model",
+]
 
 model_store = store(group="model")
 

@@ -14,10 +14,10 @@ from ..validate import RawDataModel
 from ._cache import cache
 
 logger = logging.getLogger(__name__)
-PATH_SQL_PATTERN = Path(__file__).parent / "sql" / "*.sql"
+PATH_SQL_PATTERN = str(Path(__file__).parent / "sql" / "*.sql")
 
 
-def load_sql_files(pattern: Path | str = PATH_SQL_PATTERN) -> frozendict[str, str]:
+def load_sql_files(pattern: str = PATH_SQL_PATTERN) -> frozendict[str, str]:
     """Load sql files into name-content pairs.
 
     Args:
@@ -26,7 +26,7 @@ def load_sql_files(pattern: Path | str = PATH_SQL_PATTERN) -> frozendict[str, st
     Returns:
         Dictionary with file names as keys and file content as values.
     """
-    paths = map(Path, sorted(glob.glob(str(pattern), recursive=True)))
+    paths = map(Path, sorted(glob.glob(pattern, recursive=True)))
     queries = frozendict({p.stem: p.read_text(encoding="utf-8") for p in paths})
     return queries
 
@@ -60,7 +60,6 @@ def fetch_data(
     sql_queries: frozendict[str, str],
     *,
     data_model: type[pa.DataFrameModel] = RawDataModel,
-    force: bool = False,
 ) -> pd.DataFrame:
     """Fetch all data from the database based on index-bound SQL queries.
 
@@ -70,7 +69,7 @@ def fetch_data(
         params: Key-value substitutions for parameterized queries.
         db_engine: Database connection engine.
         sql_queries: Name-query pairs to fetch.
-        force: Purge cache (completely) and fetch freshly.
+        data_model: Data model for validation and conversion.
 
     Returns:
         DataFrame with collected data from all sources.
@@ -82,7 +81,7 @@ def fetch_data(
     date_col = ["date"]  # Any possibly appearing date-columns
 
     # Fetch index with identifiers first
-    logger.info("Fetch index")
+    logger.debug("Fetch index")
     qrx = bind_sql_params(queries.pop("index"), **params)
     index = pd.read_sql(qrx, db_engine, params=params, parse_dates=date_col)
     identifiers = index.columns.to_list()
@@ -91,7 +90,7 @@ def fetch_data(
     # Fetch and left join the feature and target columns on the identifiers
     dfs: list[pd.DataFrame] = []
     for name, query in queries.items():
-        logger.info(f"Fetch {name}")
+        logger.debug(f"Fetch {name}")
         dfs.append(
             pd.read_sql(
                 bind_sql_params(query, **params),
@@ -103,4 +102,5 @@ def fetch_data(
         )
     df = index.join(dfs, validate="1:1").reset_index()
 
+    logger.debug("Validate raw data")
     return data_model.validate(df)

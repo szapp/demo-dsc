@@ -20,7 +20,7 @@
             }
         },
         {
-            "name": "Dev",
+            "name": "Train",
             "type": "debugpy",
             "request": "launch",
             "console": "integratedTerminal",
@@ -32,7 +32,23 @@
                 "ENV": "dev",
             },
             "windows": {
-                "program": "${workspaceFolder}/.venv/Script/train.exe"
+                "program": "${workspaceFolder}/.venv/Scripts/train.exe"
+            }
+        },
+        {
+            "name": "Predict",
+            "type": "debugpy",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "program": "${workspaceFolder}/.venv/bin/predict",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONUNBUFFERED": "1",
+                "ENV": "dev",
+            },
+            "windows": {
+                "program": "${workspaceFolder}/.venv/Scripts/predict.exe"
             }
         },
         {
@@ -51,7 +67,7 @@
                 "ENV": "dev",
             },
             "windows": {
-                "program": "${workspaceFolder}/.venv/Script/train.exe"
+                "program": "${workspaceFolder}/.venv/Scripts/train.exe"
             }
         }
     ],

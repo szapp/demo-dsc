@@ -10,7 +10,7 @@ dependencies = [
     "hydra-optuna-sweeper>=1.2.0",
     "hydra-zen>=0.16.0",
     "joblib>=1.5.3",
-    "mlflow>=3.8.1",
+    "mlflow>=3.10.1",
     "numpy>=2.4.2",
     "omegaconf>=2.3.0",
     "optuna>=4.7.0",
@@ -23,6 +23,7 @@ dependencies = [
     "python-dotenv>=1.2.1",
     "python-json-logger>=4.0.0",
     "scikit-learn>=1.8.0",
+    "skops>=0.13.0",
     "sqlalchemy>=2.0.45",
     "tqdm>=4.67.3",
 ]
@@ -160,7 +161,7 @@ omit-covered-files = true
 verbose = 2
 fail-under = 100
 whitelist-regex = ["test_.*"]
-exclude = [".cache"]
+exclude = ["*.cache"]
 style = "google"
 
 [tool.complexipy]

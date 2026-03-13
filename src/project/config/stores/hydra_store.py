@@ -1,9 +1,11 @@
 """Config store for hydra base configuration, e.g. logging, directories."""
 
-__all__ = []  # No exports. Use the global store
-
 from hydra.conf import HydraConf, JobConf, RunDir
 from hydra_zen import store
+
+from ...version import SERVICE, VERSION
+
+__all__ = []  # No exports. Use the global store
 
 hydra_store = store()  # Hydra config does not need group or name
 
@@ -16,8 +18,20 @@ hydra_store(
             {"override hydra_logging": "colorlog"},
             {"override launcher": "joblib"},
         ],
-        run=RunDir(dir="outputs/${exp_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}"),
-        job=JobConf(name="${exp_name}", chdir=True),
+        run=RunDir(
+            dir=(
+                "outputs/${hydra.job.name}-${hydra.job.config_name}/"
+                "${now:%Y-%m-%d}/${now:%H-%M-%S}"
+            )
+        ),
+        job=JobConf(
+            chdir=True,
+            env_set={
+                "ENV": "${oc.env:ENV,dev}",
+                "MLFLOW_EXPERIMENT_NAME": SERVICE,
+                "MLFLOW_TRACKING_URI": "sqlite:///${hydra.runtime.cwd}/mlflow.db",
+            },
+        ),
         job_logging={
             "formatters": {
                 "structured": {
@@ -34,6 +48,9 @@ hydra_store(
                     ],
                     "timestamp": True,
                     "rename_fields": {"levelname": "status"},
+                    "static_fields": {
+                        "dd.version": VERSION,
+                    },
                     "exc_info_as_array": False,
                     "stack_info_as_array": False,
                 },
@@ -54,16 +71,13 @@ hydra_store(
                 },
             },
             "loggers": {
-                "mlflow": {"handlers": [], "level": "WARNING", "propagate": True},
+                "mlflow": {"handlers": [], "propagate": True},
                 "mlflow.types.type_hints": {"level": "ERROR"},
-                "alembic": {"handlers": [], "level": "WARNING", "propagate": True},
+                "alembic": {"handlers": [], "propagate": True},
                 "sqlalchemy.engine": {"handlers": [], "propagate": True},
-                "urllib3": {"level": "WARNING"},
-                "git": {"level": "WARNING"},
             },
             "root": {
                 "handlers": ["file", "monitoring", "console"],  # Order for coloring
-                "level": "${oc.select:log_level,INFO}",
             },
         },
         hydra_logging={

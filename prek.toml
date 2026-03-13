@@ -18,33 +18,15 @@ repo = "https://gitlab.com/bmares/check-json5"
 rev = "v1.0.1"
 hooks = [{id = "check-json5"}]
 
-[[repos]]
-repo = "https://github.com/astral-sh/uv-pre-commit"
-rev = "0.10.8"
-hooks = [{id = "uv-lock"}]
-
-[[repos]]
-repo = "https://github.com/astral-sh/ruff-pre-commit"
-rev = "v0.15.4"
-hooks = [
-    {id = "ruff", types_or = ["python", "pyi"], args = ["--fix"]},
-    {id = "ruff-format", types_or = ["python", "pyi"]},
-]
-
-[[repos]]
-repo = "https://github.com/econchick/interrogate"
-rev = "1.7.0"
-hooks = [{id = "interrogate", pass_filenames = false}]
-
-[[repos]]
-repo = "https://github.com/rohaquinlop/complexipy-pre-commit"
-rev = "v5.1.0"
-hooks = [{id = "complexipy"}]
-
 # Local hooks require UV
 [[repos]]
 repo = "local"
 hooks = [
-    {id = "tach", name = "tach", entry = "uvx tach check", language = "system", pass_filenames = false},
-    {id = "ty", name = "ty", entry = "uvx ty check src", language = "system", pass_filenames = false},
+    {id = "uv-lock", name = "uv-lock", entry = "uv lock", language = "system", files = "^(uv\\.lock|pyproject\\.toml|uv\\.toml)$", pass_filenames = false},
+    {id = "ruff-check", name = "ruff-check", entry = "uv run ruff check", language = "system", types_or = ["python", "pyi"], args = ["--force-exclude", "--fix"], require_serial = true},
+    {id = "ruff-format", name = "ruff-format", entry = "uv run ruff format", language = "system", types_or = ["python", "pyi"], args = ["--force-exclude"], require_serial = true},
+    {id = "ty", name = "ty", entry = "uv run ty check src", language = "system", pass_filenames = false},
+    {id = "tach", name = "tach", entry = "uv run tach check", language = "system", pass_filenames = false},
+    {id = "interrogate", name = "interrogate", entry = "uv run interrogate tests", language = "system", types_or = ["python", "pyi"], require_serial = true},
+    {id = "complexipy", name = "complexipy", entry = "uv run complexipy", language = "system", types_or = ["python", "pyi"], require_serial = true},
 ]

@@ -11,8 +11,8 @@ from sklearn.model_selection import BaseCrossValidator, KFold, cross_validate
 from sklearn.pipeline import Pipeline
 
 from ..config import make_cli, make_model, store
-from ..data import process_data
 from ..types import SqlParams
+from ..version import PACKAGE
 
 logger = logging.getLogger(__name__)
 YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
@@ -27,6 +27,7 @@ YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
     hydra_defaults=[
         "_self_",
         {"dataloader": "prod"},
+        {"dataprocessor": "prod"},
         {"model": "prod"},
         {"validator": "5fold"},
     ],
@@ -39,6 +40,7 @@ YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
     hydra_defaults=[
         "_self_",
         {"dataloader": "prod"},
+        {"dataprocessor": "prod"},
         {"model": "prod"},
         {"validator": "5fold"},
     ],
@@ -51,13 +53,15 @@ YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
     hydra_defaults=[
         "_self_",
         {"dataloader": "prod"},
+        {"dataprocessor": "prod"},
         {"model": "prod"},
         {"validator": "5fold"},
     ],
-    zen_meta={"log_level": "DEBUG"},
+    zen_meta={"hydra": {"verbose": [PACKAGE]}},
 )
 def evaluate(
     dataloader: Callable[[SqlParams], pd.DataFrame],
+    dataprocessor: Callable[[pd.DataFrame], tuple[pd.DataFrame, pd.Series]],
     start_date: PastDate = cast(PastDate, "2026-01-01"),
     end_date: PastDate = cast(PastDate, YESTERDAY),
     model: Pipeline = make_model("prod"),
@@ -67,7 +71,8 @@ def evaluate(
     """Evaluate a model.
 
     Args:
-        dataloader: Function to produce data given the dates.
+        dataloader: Callable to produce data given the SQL parameters.
+        dataprocessor: Callable to process and split the data at the target column.
         start_date: Starting date of data.
         end_date: End date of the data.
         model: Scikit-Learn ML pipeline.
@@ -77,11 +82,12 @@ def evaluate(
     Returns:
         The score of the evaluated fit.
     """
-    sql_params = {"start_date": start_date, "end_date": end_date}
+    logger.debug("Start experiment")
+    sql_params: SqlParams = {"start_date": start_date, "end_date": end_date}
     raw = dataloader(sql_params)
-    X, y = process_data(raw, "target")
+    X, y = dataprocessor(raw)
 
-    with mlflow.start_run(nested=True):  # type: ignore
+    with mlflow.start_run(nested=True):
         logger.info(f"Run validation with {validator!s}.")
         results = cross_validate(model, X, y, cv=validator)
         score = results["test_score"].mean()
