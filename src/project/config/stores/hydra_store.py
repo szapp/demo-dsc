@@ -55,6 +55,11 @@ hydra_store(
                     "stack_info_as_array": False,
                 },
             },
+            "filters": {
+                "context": {
+                    "()": "project.util.logging_vars.LoggingVarsFilter",
+                }
+            },
             "handlers": {
                 "file": {
                     "filename": "${hydra.runtime.output_dir}/${hydra.job.name}.log",
@@ -63,6 +68,7 @@ hydra_store(
                 "monitoring": {
                     "()": "logging.handlers.RotatingFileHandler",
                     "level": "INFO",
+                    "filters": ["context"],
                     "formatter": "structured",
                     "filename": "${hydra.runtime.cwd}/logs/structured.log",
                     "encoding": "utf-8",

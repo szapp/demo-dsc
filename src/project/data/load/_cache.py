@@ -3,13 +3,14 @@
 import logging
 import os
 from collections.abc import Callable
+from functools import wraps
 from typing import Protocol, cast, overload
 
 from joblib import Memory, expires_after
 from joblib.memory import MemorizedFunc
 
 ENV_VAR_CACHE_DIR = "JOBLIB_CACHE_DIR"
-DEFAULT_CACHE_DIR = f"~{os.sep}.cache"  # Joblib resolves the path automatically
+DEFAULT_CACHE_DIR = "~" + os.sep + ".cache"  # Joblib resolves the path automatically
 PATH_CACHE_DIR = os.environ.get(ENV_VAR_CACHE_DIR) or DEFAULT_CACHE_DIR
 memory = Memory(location=PATH_CACHE_DIR, verbose=0)
 logger = logging.getLogger(__name__)
@@ -41,8 +42,14 @@ def cache[**P, R](
         joblib_kwargs.setdefault("cache_validation_callback", expires_after(hours=6))
         cached_func = _instance.cache(func, **joblib_kwargs)
 
+        func_module = getattr(func, "__module__", "")
+        func_name = getattr(func, "__qualname__", str(func))
+        func_fullname = f"{func_module}.{func_name}".lstrip(".")
+
+        @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             """Pydantic does not support objects, only functions, so wrap it."""
+            logger.debug(f"Attempt to retrieve cache for {func_fullname}")
             return cached_func(*args, **kwargs)
 
         # Keep references accessible
