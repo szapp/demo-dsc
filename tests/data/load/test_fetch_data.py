@@ -12,7 +12,7 @@ from sqlalchemy import create_engine
 
 from project.data import fetch_data
 
-fetch_data_uncached = getattr(fetch_data, "__wrapped__", None) or fetch_data
+fetch_data_uncached = getattr(fetch_data, "uncached", None) or fetch_data
 
 
 class RawDataModel(pa.DataFrameModel):

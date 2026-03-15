@@ -9,9 +9,9 @@ on:
       - main
 
 env:
-  UV_LOCKED: "true"
-  UV_NO_DEFAULT_GROUPS: "true"
-  UV_DEV: "true"
+  UV_LOCKED: true
+  UV_NO_DEFAULT_GROUPS: true
+  UV_DEV: true
 
 jobs:
   ci:
@@ -22,10 +22,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: "Set up Python"
+      - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version-file: ".python-version"
+          python-version-file: .python-version
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
@@ -57,8 +57,9 @@ jobs:
         run: uv run pytest --inline-snapshot=disable --junitxml=junit/test-results.xml
 
       - name: Upload pytest test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pytest-results
           path: junit/test-results.xml
+          retention-days: 7
         if: ${{ always() }}

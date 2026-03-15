@@ -2,19 +2,26 @@
 
 import glob
 import logging
+import os
 from pathlib import Path
 
 import pandas as pd
 import pandera.pandas as pa
 from frozendict import frozendict
+from joblib import expires_after
+from joblib_typed_cache import Memory
 from sqlalchemy import Engine, TextClause, bindparam, text
 
 from ...types import SqlParam, SqlParams
 from ..validate import RawDataModel
-from ._cache import cache
 
-logger = logging.getLogger(__name__)
 PATH_SQL_PATTERN = str(Path(__file__).parent / "sql" / "*.sql")
+ENV_VAR_CACHE_DIR = "JOBLIB_CACHE_DIR"
+DEFAULT_CACHE_DIR = "~" + os.sep + ".cache"  # Joblib resolves the path automatically
+PATH_CACHE_DIR = os.environ.get(ENV_VAR_CACHE_DIR) or DEFAULT_CACHE_DIR
+memory = Memory(location=PATH_CACHE_DIR, verbose=0)
+cache = memory.cache(cache_validation_callback=expires_after(hours=6))
+logger = logging.getLogger(__name__)
 
 
 def load_sql_files(pattern: str = PATH_SQL_PATTERN) -> frozendict[str, str]:

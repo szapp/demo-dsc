@@ -120,7 +120,7 @@
     "evenBetterToml.formatter.arrayAutoExpand": false,
     "evenBetterToml.formatter.arrayTrailingComma": true,
     "evenBetterToml.formatter.compactInlineTables": true,
-    "evenBetterToml.schema.enabled": false, // Pyproject.toml JSON-Schema ist outdatet und nervt
+    "evenBetterToml.schema.enabled": false, // Pyproject.toml JSON-Schema is not always up-to-date
     "[yaml]": {
         "editor.defaultFormatter": "redhat.vscode-yaml",
         "editor.formatOnSave": true,

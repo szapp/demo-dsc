@@ -80,6 +80,7 @@ hydra_store(
                 "mlflow": {"handlers": [], "propagate": True},
                 "mlflow.types.type_hints": {"level": "ERROR"},
                 "alembic": {"handlers": [], "propagate": True},
+                "joblib_typed_cache": {"level": "DEBUG"},
                 "sqlalchemy.engine": {"handlers": [], "propagate": True},
             },
             "root": {

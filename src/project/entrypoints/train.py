@@ -78,7 +78,7 @@ def train(
     """
     mlflow.sklearn.autolog(serialization_format="skops")
 
-    sql_params: SqlParams = {"start_date": start_date, "end_date": end_date}
+    sql_params = {"start_date": start_date, "end_date": end_date}
     raw = dataloader(sql_params)
     X, y = dataprocessor(raw)
 

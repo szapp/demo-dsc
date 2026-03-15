@@ -1,5 +1,6 @@
 """Types and type hint definitions."""
 
+from collections.abc import Mapping
 from datetime import date, datetime
 from typing import Annotated
 
@@ -9,7 +10,7 @@ from sklearn.utils.validation import check_is_fitted
 
 SqlPrimitive = str | int | float | date | datetime
 SqlParam = SqlPrimitive | tuple[SqlPrimitive, ...]
-SqlParams = dict[str, SqlParam]
+SqlParams = Mapping[str, SqlParam]
 
 FittedPipeline = Annotated[
     Pipeline,

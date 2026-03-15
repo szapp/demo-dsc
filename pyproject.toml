@@ -10,6 +10,7 @@ dependencies = [
     "hydra-optuna-sweeper>=1.2.0",
     "hydra-zen>=0.16.0",
     "joblib>=1.5.3",
+    "joblib-typed-cache>=0.1.0",
     "mlflow>=3.10.1",
     "numpy>=2.4.2",
     "omegaconf>=2.3.0",

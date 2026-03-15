@@ -11,4 +11,4 @@ A file `index.sql` is required to define the identifier column(s) on which the f
 ## Caching
 
 The joined and validated data is cached to disk.
-Subsequent calls to the central loading function return the cached result until the cache expires or purged by a forced recompute.
+Subsequent calls to the central loading function return the cached result until the cache expires or purged by `func.clear()`.
