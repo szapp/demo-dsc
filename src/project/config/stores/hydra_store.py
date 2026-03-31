@@ -14,7 +14,7 @@ hydra_store(
     HydraConf(
         defaults=HydraConf().defaults
         + [
-            {"override job_logging": "colorlog"},
+            {"override job_logging": "structlog"},
             {"override hydra_logging": "colorlog"},
             {"override launcher": "joblib"},
         ],
@@ -28,52 +28,16 @@ hydra_store(
             chdir=True,
             env_set={
                 "ENV": "${oc.env:ENV,dev}",
+                "SERVICE": SERVICE,
+                "VERSION": VERSION,
                 "MLFLOW_EXPERIMENT_NAME": SERVICE,
                 "MLFLOW_TRACKING_URI": "sqlite:///${hydra.runtime.cwd}/mlflow.db",
             },
         ),
         job_logging={
-            "formatters": {
-                "structured": {
-                    "()": "pythonjsonlogger.json.JsonFormatter",
-                    "fmt": [
-                        "timestamp",
-                        "levelname",
-                        "message",
-                        "name",
-                        "funcName",
-                        "lineno",
-                        # "dd.trace_id",
-                        # "dd.span_id",
-                    ],
-                    "timestamp": True,
-                    "rename_fields": {"levelname": "status"},
-                    "static_fields": {
-                        "dd.version": VERSION,
-                    },
-                    "exc_info_as_array": False,
-                    "stack_info_as_array": False,
-                },
-            },
-            "filters": {
-                "context": {
-                    "()": "project.util.logging_vars.LoggingVarsFilter",
-                }
-            },
             "handlers": {
-                "file": {
-                    "filename": "${hydra.runtime.output_dir}/${hydra.job.name}.log",
-                    "encoding": "utf-8",
-                },
-                "monitoring": {
-                    "()": "logging.handlers.RotatingFileHandler",
-                    "level": "INFO",
-                    "filters": ["context"],
-                    "formatter": "structured",
+                "json": {
                     "filename": "${hydra.runtime.cwd}/logs/structured.log",
-                    "encoding": "utf-8",
-                    "maxBytes": 1024**2,  # 1 MB
-                    "backupCount": 1,  # Important for safe rotation (structured.log.1)
                 },
             },
             "loggers": {
@@ -82,9 +46,6 @@ hydra_store(
                 "alembic": {"handlers": [], "propagate": True},
                 "joblib_typed_cache": {"level": "DEBUG"},
                 "sqlalchemy.engine": {"handlers": [], "propagate": True},
-            },
-            "root": {
-                "handlers": ["file", "monitoring", "console"],  # Order for coloring
             },
         },
         hydra_logging={

@@ -11,6 +11,7 @@ from frozendict import frozendict
 from joblib import expires_after
 from joblib_typed_cache import Memory
 from sqlalchemy import Engine, TextClause, bindparam, text
+from structlog.contextvars import bind_contextvars, unbind_contextvars
 
 from ...types import SqlParam, SqlParams
 from ..validate import RawDataModel
@@ -88,6 +89,7 @@ def fetch_data(
     date_col = ["date"]  # Any possibly appearing date-columns
 
     # Fetch index with identifiers first
+    bind_contextvars(query_name="index")
     logger.debug("Fetch index")
     qrx = bind_sql_params(queries.pop("index"), **params)
     index = pd.read_sql(qrx, db_engine, params=params, parse_dates=date_col)
@@ -97,6 +99,7 @@ def fetch_data(
     # Fetch and left join the feature and target columns on the identifiers
     dfs: list[pd.DataFrame] = []
     for name, query in queries.items():
+        bind_contextvars(query_name=name)
         logger.debug(f"Fetch {name}")
         dfs.append(
             pd.read_sql(
@@ -107,6 +110,7 @@ def fetch_data(
                 parse_dates=date_col,
             )
         )
+    unbind_contextvars("query_name")
     df = index.join(dfs, validate="1:1").reset_index()
 
     logger.debug("Validate raw data")
