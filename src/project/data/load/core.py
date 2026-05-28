@@ -54,8 +54,8 @@ def bind_sql_params(query: str, **params: SqlParam) -> TextClause:
     stmt = text(query)
     used = stmt._bindparams.keys()
     bound_params = (
-        bindparam(param, expanding=isinstance(v, tuple))
-        for param, v in params.items()
+        bindparam(param, value, expanding=isinstance(value, tuple))
+        for param, value in params.items()
         if param in used
     )
     return stmt.bindparams(*bound_params)
@@ -91,8 +91,8 @@ def fetch_data(
     # Fetch index with identifiers first
     bind_contextvars(query_name="index")
     logger.debug("Fetch index")
-    qrx = bind_sql_params(queries.pop("index"), **params)
-    index = pd.read_sql(qrx, db_engine, params=params, parse_dates=date_col)
+    stmt = bind_sql_params(queries.pop("index"), **params)
+    index = pd.read_sql(stmt, db_engine, parse_dates=date_col)
     identifiers = index.columns.to_list()
     index = index.set_index(identifiers)
 
@@ -105,7 +105,6 @@ def fetch_data(
             pd.read_sql(
                 bind_sql_params(query, **params),
                 db_engine,
-                params=params,
                 index_col=identifiers,
                 parse_dates=date_col,
             )
