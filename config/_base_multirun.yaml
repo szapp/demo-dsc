@@ -1,0 +1,26 @@
+defaults:
+  - override /hydra/sweeper: optuna
+
+run_name: ${hydra:sweep.subdir}
+hydra:
+  mode: MULTIRUN
+  sweep:
+    subdir: ${hydra.job.num}-${hydra.job.override_dirname}
+  job:
+    config:
+      override_dirname:
+        exclude_keys:
+          - experiment
+  callbacks:
+    parent_run:
+      _target_: project.config.ParentRunCallback
+      name: ${hydra.job.name}-${hydra.job.config_name}_${now:%Y%m%d}_${now:%H%M%S}
+      # description:
+  sweeper:
+    sampler:
+      seed: 42
+    direction: maximize
+    storage: sqlite:///${hydra.runtime.cwd}/optuna.db
+    # params:
+    # n_trials:
+    # n_jobs:

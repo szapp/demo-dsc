@@ -1,6 +1,6 @@
 """Config store for hydra base configuration, e.g. logging, directories."""
 
-from hydra.conf import HydraConf, JobConf, RunDir
+from hydra.conf import HydraConf, JobConf, RunDir, SweepDir
 from hydra_zen import store
 
 from ...version import SERVICE, VERSION
@@ -24,6 +24,7 @@ hydra_store(
                 "${now:%Y-%m-%d}/${now:%H-%M-%S}"
             )
         ),
+        sweep=SweepDir(dir="${hydra.run.dir}"),
         job=JobConf(
             chdir=True,
             env_set={

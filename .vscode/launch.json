@@ -26,6 +26,7 @@
             "console": "integratedTerminal",
             "justMyCode": false,
             "program": "${workspaceFolder}/.venv/bin/train",
+            "args": [],
             "cwd": "${workspaceFolder}",
             "env": {
                 "PYTHONUNBUFFERED": "1",
@@ -42,6 +43,7 @@
             "console": "integratedTerminal",
             "justMyCode": false,
             "program": "${workspaceFolder}/.venv/bin/predict",
+            "args": [],
             "cwd": "${workspaceFolder}",
             "env": {
                 "PYTHONUNBUFFERED": "1",
@@ -59,7 +61,7 @@
             "justMyCode": false,
             "program": "${workspaceFolder}/.venv/bin/train",
             "args": [
-                "+experimtent=${input:experiment_name}"
+                "+experiment=${input:experiment_name}"
             ],
             "cwd": "${workspaceFolder}",
             "env": {
