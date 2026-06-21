@@ -1,6 +1,7 @@
 """Config store for ML models."""
 
 from hydra_zen import instantiate, store
+from mlflow.sklearn import load_model as load_mlflow_model
 from sklearn.compose import ColumnTransformer, make_column_selector
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
@@ -8,6 +9,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+from ...version import SERVICE
 from .util import build_columns, build_steps, build_transformers, builds
 
 __all__ = [
@@ -20,6 +22,14 @@ model_store = store(group="model")
 def make_model(name: str = "prod") -> Pipeline:
     """Instantiate an ML model from the model config store for use in notebooks."""
     return instantiate(model_store.get_entry(group="model", name=name)["node"])
+
+
+model_store(
+    load_mlflow_model,
+    model_uri=f"models:/{SERVICE}-prod@champion",
+    dst_path=".",
+    name="champion",
+)
 
 
 # Preprocessing step
