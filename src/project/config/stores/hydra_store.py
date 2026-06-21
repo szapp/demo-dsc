@@ -30,8 +30,10 @@ hydra_store(
                 "ENV": "${oc.env:ENV,dev}",
                 "SERVICE": SERVICE,
                 "VERSION": VERSION,
+                "MLFLOW_CONFIGURE_LOGGING": "0",
                 "MLFLOW_EXPERIMENT_NAME": SERVICE,
                 "MLFLOW_TRACKING_URI": "sqlite:///${hydra.runtime.cwd}/mlflow.db",
+                "_MLFLOW_SERVER_ARTIFACT_ROOT": "${hydra.runtime.cwd}/mlruns",
             },
         ),
         job_logging={
@@ -41,9 +43,9 @@ hydra_store(
                 },
             },
             "loggers": {
-                "mlflow": {"handlers": [], "propagate": True},
+                "mlflow": {"handlers": [], "level": "WARNING", "propagate": True},
                 "mlflow.types.type_hints": {"level": "ERROR"},
-                "alembic": {"handlers": [], "propagate": True},
+                "alembic": {"handlers": [], "level": "WARNING", "propagate": True},
                 "joblib_typed_cache": {"level": "DEBUG"},
                 "sqlalchemy.engine": {"handlers": [], "propagate": True},
             },
