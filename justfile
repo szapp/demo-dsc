@@ -43,7 +43,7 @@ check-complexity:
 
 # Run linting, formatting, tests and type-checking
 [group('check')]
-check-all: lint test typing check-imports check-testdocs check-complexity
+check-all: lint test typing check-imports check-testdocs check-complexity check-sql
 
 ##############
 # LIFE CYCLE #

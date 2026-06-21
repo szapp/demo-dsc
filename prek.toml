@@ -29,4 +29,5 @@ hooks = [
     {id = "tach", name = "tach", entry = "uv run tach check", language = "system", pass_filenames = false},
     {id = "interrogate", name = "interrogate", entry = "uv run interrogate tests", language = "system", types_or = ["python", "pyi"], require_serial = true},
     {id = "complexipy", name = "complexipy", entry = "uv run complexipy", language = "system", types_or = ["python", "pyi"], require_serial = true},
+    {id = "sqlfluff", name = "sqlfluff", entry = "uv run sqlfluff fix --show-lint-violations --processes 0 --disable-progress-bar", language = "system", types = ["sql"], require_serial = true},
 ]

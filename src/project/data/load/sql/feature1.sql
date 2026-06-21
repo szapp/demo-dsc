@@ -1,41 +1,41 @@
-WITH
-base(n) AS ( VALUES (0), (1), (2), (3), (4), (5), (6), (7), (8), (9) ),
+with
+base (n) as (values (0), (1), (2), (3), (4), (5), (6), (7), (8), (9)),
 
-numbers AS (
-    SELECT a.n + 10 * b.n AS n
-    FROM base a CROSS JOIN base b
+numbers as (
+    select bsa.n + 10 * bsb.n as n
+    from base as bsa cross join base as bsb
 ),
 
-dates AS (
-    SELECT
-        date(:start_date, '+' || n || ' days') as date,
-        n as counter
-    FROM numbers
-    WHERE date(:start_date, '+' || n || ' days') <= :end_date
+dates as (
+    select
+        n as counter,
+        date(:start_date, '+' || n || ' days') as 'date'
+    from numbers
+    where date(:start_date, '+' || n || ' days') <= :end_date
 ),
 
-identifiers AS (
-    SELECT n as identifier
-    FROM base
-    WHERE n <= 3 -- E.g. if it misses some identifiers from the index, requires data cleaning
+identifiers as (
+    select n as identifier
+    from base
+    -- E.g. missing identifiers from the index require data cleaning
+    where n <= 3
 )
 
-SELECT
-    identifier AS id,
-    date,
-    counter * 3.1 AS col1,
-    counter * 5.0 AS col2,
-    CASE counter % 3
-        WHEN 0 THEN null
-        ELSE true
-    END AS col3,
-    CASE counter % 5
-        WHEN 0 THEN 'Apple'
-        WHEN 1 THEN 'Banana'
-        WHEN 2 THEN 'Cherry'
-        WHEN 3 THEN 'Date'
-        ELSE null
-    END AS col4
-FROM identifiers
-CROSS JOIN dates
-ORDER BY identifier, date;
+select
+    idn.identifier as id,
+    dte.date,
+    dte.counter * 3.1 as col1,
+    dte.counter * 5.0 as col2,
+    case dte.counter % 3
+        when 0 then null
+        else true
+    end as col3,
+    case dte.counter % 5
+        when 0 then 'Apple'
+        when 1 then 'Banana'
+        when 2 then 'Cherry'
+        when 3 then 'Date'
+    end as col4
+from identifiers as idn
+cross join dates as dte
+order by idn.identifier, dte.date;

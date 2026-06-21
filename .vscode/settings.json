@@ -140,5 +140,16 @@
             "source.fixAll.markdownlint": "explicit"
         },
         "editor.renderWhitespace": "boundary" // To see trailing whitespace characters
-    }
+    },
+    "[sql]": {
+        "editor.defaultFormatter": "sqlfluff.vscode-sqlfluff",
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.markdownlint": "explicit"
+        },
+        "editor.rulers": [
+            88
+        ],
+    },
 }

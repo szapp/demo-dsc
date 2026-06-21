@@ -10,6 +10,7 @@
         "rohaquinlop.complexipy",
         "ms-toolsai.datawrangler",
         // Syntax and formatting
+        "sqlfluff.vscode-sqlfluff",
         "timonwong.shellcheck",
         "DavidAnson.vscode-markdownlint",
         "redhat.vscode-yaml",

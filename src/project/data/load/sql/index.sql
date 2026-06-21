@@ -1,27 +1,27 @@
 -- This SQL determines the identifiers that other SQLs are based on
-WITH
-base(n) AS ( VALUES (0), (1), (2), (3), (4), (5), (6), (7), (8), (9) ),
+with
+base (n) as (values (0), (1), (2), (3), (4), (5), (6), (7), (8), (9)),
 
-numbers AS (
-    SELECT a.n + 10*b.n AS n
-    FROM base a CROSS JOIN base b
+numbers as (
+    select bsa.n + 10 * bsb.n as n
+    from base as bsa cross join base as bsb
 ),
 
-dates AS (
-    SELECT date(:start_date, '+' || n || ' days') AS date
-    FROM numbers
-    WHERE date(:start_date, '+' || n || ' days') <= :end_date
+dates as (
+    select date(:start_date, '+' || n || ' days') as 'date'
+    from numbers
+    where date(:start_date, '+' || n || ' days') <= :end_date
 ),
 
-identifiers AS (
-    SELECT n AS identifier
-    FROM base
-    WHERE n <= 3
+identifiers as (
+    select n as identifier
+    from base
+    where n <= 3
 )
 
-SELECT
-    identifier AS id,
-    date
-FROM identifiers
-CROSS JOIN dates
-ORDER BY identifier, date;
+select
+    idn.identifier as id,
+    dte.date
+from identifiers as idn
+cross join dates as dte
+order by idn.identifier, dte.date;
