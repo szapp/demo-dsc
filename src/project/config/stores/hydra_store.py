@@ -47,6 +47,7 @@ hydra_store(
                 "joblib_typed_cache": {"level": "DEBUG"},
                 "sqlalchemy.engine": {"handlers": [], "propagate": True},
             },
+            "root": {"handlers": ["file", "json"]},
         },
         hydra_logging={
             "loggers": {
@@ -54,4 +55,11 @@ hydra_store(
             },
         },
     ),
+)
+
+# Additional console logging handler for development
+store(
+    ["json", "file", "console"],
+    group="hydra/job_logging/root/handlers",
+    name="console",
 )

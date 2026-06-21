@@ -23,35 +23,34 @@ YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
 @store(
     name="prod",
     exp_name="train_prod",
-    model=None,
     hydra_defaults=[
-        "_self_",
         {"dataloader": "prod"},
         {"dataprocessor": "prod"},
         {"model": "prod"},
+        "_self_",
     ],
 )
 @store(
     name="test",
     exp_name="train_test",
-    model=None,
     hydra_defaults=[
-        "_self_",
         {"dataloader": "prod"},
         {"dataprocessor": "prod"},
         {"model": "prod"},
+        "_self_",
     ],
 )
 @store(
     name="dev",
     exp_name="train_dev",
-    model=None,
     hydra_defaults=[
-        "_self_",
+        {"hydra/job_logging/root/handlers": "console"},
         {"dataloader": "prod"},
         {"dataprocessor": "prod"},
         {"model": "prod"},
+        "_self_",
     ],
+    model={"verbose": True},
     zen_meta={"hydra": {"verbose": [PACKAGE]}},
 )
 def train(

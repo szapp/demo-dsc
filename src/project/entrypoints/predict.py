@@ -18,32 +18,30 @@ YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
 @sklearn.config_context(transform_output="pandas")
 @store(
     name="prod",
-    model=None,
     hydra_defaults=[
-        "_self_",
         {"dataloader": "prod"},
         {"dataprocessor": "prod"},
         {"model": "prod"},
+        "_self_",
     ],
 )
 @store(
     name="test",
-    model=None,
     hydra_defaults=[
-        "_self_",
         {"dataloader": "prod"},
         {"dataprocessor": "prod"},
         {"model": "prod"},
+        "_self_",
     ],
 )
 @store(
     name="dev",
-    model=None,
     hydra_defaults=[
-        "_self_",
+        {"hydra/job_logging/root/handlers": "console"},
         {"dataloader": "prod"},
         {"dataprocessor": "prod"},
         {"model": "prod"},
+        "_self_",
     ],
     zen_meta={"hydra": {"verbose": [PACKAGE]}},
 )
