@@ -12,7 +12,7 @@ dependencies = [
     "hydra-zen>=0.16.0",
     "joblib-typed-cache>=0.1.0",
     "joblib>=1.5.3",
-    "mlflow>=3.10.1",
+    "mlflow>=3.13.0,!=3.14.0",
     "numpy>=2.4.2",
     "omegaconf>=2.3.0",
     "optuna>=4.7.0",

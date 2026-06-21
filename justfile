@@ -79,10 +79,10 @@ upgrade python='3.14': (_upgrade_python python)
 @_upgrade_python python:
     -brew upgrade --quiet uv 2> /dev/null || uv self update --quiet
     -uv python upgrade {{ python }}
-    uv python find {{ python }} --show-version --no-project 1> /dev/null
+    uv python find {{ python }} --show-version --system 1> /dev/null
     perl -i -pe 's/(^requires-python\s*=\s*)"[^"]*"/\1"=={{ python }}.*"/' pyproject.toml
     perl -i -pe "s/(^upgrade\s*python\s*)=\s*'3\.[1-9]\d+'/\1='{{ python }}'/" "{{ justfile() }}"
-    uv python pin $(uv python find {{ python }} --show-version --no-project)
+    uv python pin $(uv python find {{ python }} --show-version --system)
 
 #######
 # RUN #

@@ -16,7 +16,6 @@
     "ty.inlayHints.variableTypes": false,
     "ty.disableLanguageServices": false,
     "python.languageServer": "None", // Deactivate explicitly in favor of ty
-    "python.testing.autoTestDiscoverOnSaveEnabled": false,
     "testing.automaticallyOpenTestResults": "neverOpen",
     "testing.defaultGutterClickAction": "runWithCoverage",
     "testing.coverageToolbarEnabled": true,
@@ -24,22 +23,6 @@
     "python.testing.pytestEnabled": true,
     "python.testing.pytestArgs": [
         "--color=yes"
-    ],
-    "runOnSave.onlyRunOnManualSave": true,
-    "runOnSave.ignoreFilesBy": [
-        ".gitignore"
-    ],
-    "runOnSave.commands": [
-        {
-            "match": "\\.py$",
-            "runIn": "vscode",
-            "command": "testing.refreshTests",
-        },
-        {
-            "match": "\\.py$",
-            "runIn": "vscode",
-            "command": "testing.coverageAll",
-        }
     ],
     "jupyter.notebookFileRoot": "${workspaceFolder}",
     "notebook.formatOnSave.enabled": true,
