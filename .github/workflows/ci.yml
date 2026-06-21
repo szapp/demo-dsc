@@ -53,6 +53,9 @@ jobs:
       - name: Check complexity
         run: uv run complexipy
 
+      - name: Lint SQL
+        run: uv run sqlfluff lint --disable-progress-bar --format github-annotation-native
+
       - name: Test
         run: uv run pytest --inline-snapshot=disable --junitxml=junit/test-results.xml
 
