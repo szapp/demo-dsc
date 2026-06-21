@@ -12,6 +12,7 @@ from joblib import expires_after
 from joblib_typed_cache import Memory
 from sqlalchemy import Engine, TextClause, bindparam, text
 from structlog.contextvars import bind_contextvars, unbind_contextvars
+from tqdm.auto import tqdm
 
 from ...types import SqlParam, SqlParams
 from ..validate import RawDataModel
@@ -83,10 +84,14 @@ def fetch_data(
         DataFrame with collected data from all sources.
 
     Notes:
-        The parameter `sql_queries` is a frozendict (immutable) to allow caching.
+        The parameter `sql_queries` is a frozendict (immutable) to allow caching. The
+        cache can be cleared by invoking `fetch_data.clear()`.
     """
     queries = dict(sql_queries)
     date_col = ["date"]  # Any possibly appearing date-columns
+
+    # Format parameters for logging
+    bind_contextvars(**{k: str(v) for k, v in params.items()})
 
     # Fetch index with identifiers first
     bind_contextvars(query_name="index")
@@ -98,7 +103,7 @@ def fetch_data(
 
     # Fetch and left join the feature and target columns on the identifiers
     dfs: list[pd.DataFrame] = []
-    for name, query in queries.items():
+    for name, query in tqdm(queries.items(), desc="Load queries"):
         bind_contextvars(query_name=name)
         logger.debug(f"Fetch {name}")
         dfs.append(
@@ -109,8 +114,8 @@ def fetch_data(
                 parse_dates=date_col,
             )
         )
-    unbind_contextvars("query_name")
+    unbind_contextvars("query_name", *list(params))
     df = index.join(dfs, validate="1:1").reset_index()
 
-    logger.debug("Validate raw data")
+    logger.info("Validate raw data", extra={"num_samples": len(df)})
     return data_model.validate(df)
