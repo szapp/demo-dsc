@@ -23,9 +23,19 @@ identifiers AS (
 SELECT
     identifier AS id,
     date,
-    0.0 AS col1,
+    counter * 3.1 AS col1,
     counter * 5.0 AS col2,
-    counter * 3.1 AS col3
+    CASE counter % 3
+        WHEN 0 THEN null
+        ELSE true
+    END AS col3,
+    CASE counter % 5
+        WHEN 0 THEN 'Apple'
+        WHEN 1 THEN 'Banana'
+        WHEN 2 THEN 'Cherry'
+        WHEN 3 THEN 'Date'
+        ELSE null
+    END AS col4
 FROM identifiers
 CROSS JOIN dates
 ORDER BY identifier, date;
