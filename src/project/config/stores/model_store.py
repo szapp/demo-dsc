@@ -1,11 +1,12 @@
 """Config store for ML models."""
 
 from hydra_zen import instantiate, store
-from sklearn.compose import ColumnTransformer
+from sklearn.compose import ColumnTransformer, make_column_selector
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from .util import build_columns, build_steps, build_transformers, builds
 
@@ -22,7 +23,17 @@ def make_model(name: str = "prod") -> Pipeline:
 
 
 # Preprocessing step
-preprocessing = None
+preprocessing = builds(
+    ColumnTransformer,
+    transformers=build_transformers(
+        numeric=dict(
+            transformer=builds(SimpleImputer, strategy="constant", fill_value=0),
+            columns=builds(make_column_selector, dtype_include="number"),
+        ),
+    ),
+    remainder="passthrough",
+    verbose_feature_names_out=False,
+)
 
 # Feature engineering
 features = builds(
@@ -35,7 +46,12 @@ features = builds(
                 col2=True,
             ),
         ),
+        ohe=dict(
+            transformer=builds(OneHotEncoder, sparse_output=False),
+            columns=builds(make_column_selector, dtype_include="category"),
+        ),
     ),
+    remainder="passthrough",
     verbose_feature_names_out=False,
 )
 
@@ -48,6 +64,11 @@ feature_selection = builds(
             columns=build_columns(
                 col1=True,
                 col2=True,
+                col3=True,
+                col4_Apple=True,
+                col4_Banana=True,
+                col4_Cherry=True,
+                col4_Date=True,
             ),
         ),
     ),
