@@ -16,7 +16,6 @@ hydra_store(
         + [
             {"override job_logging": "structlog"},
             {"override hydra_logging": "colorlog"},
-            {"override launcher": "joblib"},
         ],
         run=RunDir(
             dir=(
