@@ -25,7 +25,9 @@ select
     idn.identifier as id,
     dte.date,
     dte.counter * 3.1 as col1,
-    dte.counter * 5.0 as col2,
+    case dte.counter % 7
+        when 0 then dte.counter * 5.0
+    end as col2,
     case dte.counter % 3
         when 0 then null
         else true

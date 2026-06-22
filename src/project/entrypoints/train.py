@@ -58,7 +58,7 @@ RUN_NAME = "${hydra:job.name}-${hydra:job.config_name}_${now:%Y%m%d}_${now:%H%M%
     model={"verbose": True},
     run_name=RUN_NAME,
     register_model=f"{SERVICE}-dev",
-    zen_meta={"hydra": {"verbose": [PACKAGE]}},
+    zen_meta={"hydra": {"verbose": [PACKAGE]}, "experiment": None},
 )
 def train(
     dataloader: Callable[[SqlParams], pd.DataFrame],
@@ -95,9 +95,8 @@ def train(
     logger.debug("Write raw data")
     raw.to_parquet("raw.parquet", index=False, compression="zstd")
 
-    tags = {"env": ENV, "training_cutoff": str(training_cutoff)}
     with mlflow.start_run(
-        tags=tags, run_name=run_name, description=run_description, nested=True
+        run_name=run_name, description=run_description, nested=True
     ) as run:
         bind_contextvars(run_id=run.info.run_id)
         logger.debug("Fit the model")
@@ -106,12 +105,12 @@ def train(
 
         logger.debug("Log MLflow run")
         dataset = from_pandas(X)
-        params = model.get_params() | {"steps": None}
         html = "<head><meta charset='UTF-8'></head>" + estimator_html_repr(model)
+        mlflow.set_tags({"env": ENV, "training_cutoff": str(training_cutoff)})
         mlflow.log_text(html, "estimator.html")
         mlflow.log_artifacts(".hydra", "hydra")
         mlflow.log_input(dataset, context="Train")
-        mlflow.log_params(params)
+        mlflow.log_params(model.get_params() | {"steps": None})
         mi = mlflow.sklearn.log_model(
             model,
             name="model",
