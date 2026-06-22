@@ -126,5 +126,5 @@ add-notebook name:
 # Create an experiment config
 [group('development')]
 add-experiment name:
-    printf "# @package _global_\n\nexp_name: {{ name }}\n" > config/experiment/{{ name }}.yaml
-    code -g config/experiment/{{ name }}.yaml:3:11
+    @printf "# @package _global_\n\ndefaults:\n  - /.base_single\n\nexperiment:\n  description: |\n    {{ name }}\n" > config/experiment/{{ name }}.yaml
+    code -g config/experiment/{{ name }}.yaml:8:5

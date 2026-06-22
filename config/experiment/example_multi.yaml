@@ -1,0 +1,14 @@
+# @package _global_
+
+defaults:
+  - /.base_multi
+
+experiment:
+  description: |
+    Compare feature toggle combinations.
+
+hydra:
+  sweeper:
+    params:
+      model.steps.feature_selection.transformers.passthrough.columns.col1: true,false
+      model.steps.feature_selection.transformers.passthrough.columns.col2: true,false

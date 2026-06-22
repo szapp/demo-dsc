@@ -1,0 +1,17 @@
+# @package _global_
+
+defaults:
+  - /.base_single
+
+experiment:
+  description: |
+    Check for improvement without certain features.
+
+model:
+  steps:
+    feature_selection:
+      transformers:
+        passthrough:
+          columns:
+            col1: false
+            col2: false

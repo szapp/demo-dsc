@@ -1,0 +1,13 @@
+defaults:
+  - /.base_multi
+  - override /hydra/sweeper: optuna
+
+hydra:
+  sweeper:
+    sampler:
+      seed: 42
+    direction: ???
+    storage: sqlite:///${hydra.runtime.cwd}/optuna.db
+    params: ???
+    n_trials: ???
+    n_jobs: ???

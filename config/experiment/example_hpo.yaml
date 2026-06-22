@@ -1,18 +1,17 @@
 # @package _global_
 
 defaults:
-  - /_base_multirun
-  - override /hydra/sweeper: optuna
+  - /.base_hpo
+
+experiment:
+  description: |
+    Hyperparameter optimization over a number of **estimators** and **feature toggle** of co1.
 
 hydra:
-  callbacks:
-    parent_run:
-      description: |
-        Hyperparameter optimization over number of estimators and feature toggle of co1.
   sweeper:
     direction: maximize
+    n_trials: 8
+    n_jobs: 8
     params:
       model.steps.regressor.n_estimators: "choice(10, 50, 100, 500)"
       model.steps.feature_selection.transformers.passthrough.columns.col1: "choice(true, false)"
-    n_trials: 8
-    n_jobs: 8

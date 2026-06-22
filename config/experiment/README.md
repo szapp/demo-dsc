@@ -4,6 +4,14 @@ The experiments selectively overwrite the default configuration.
 
 The experiment configs must reside in `config/experiment`.
 
+## Types of experiments
+
+There are three types of experiments.
+
+1. **Single**: Evaluation of one model configuration.
+2. **Multi**: Evaluation of several discrete model configurations. Nested under one MLflow run.
+3. **HPO**: Evaluation of continuous configurations best for hyperparameter optimization. Nested under one MLflow run.
+
 ## Run experiments
 
 There are several ways of running experiments.
