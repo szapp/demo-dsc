@@ -1,8 +1,0 @@
-run_description: ${experiment.description}
-register_model: null
-experiment:
-  description: ???
-
-hydra:
-  sweep:
-    subdir: ${hydra.job.num}-${hydra.job.override_dirname}

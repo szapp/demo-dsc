@@ -1,12 +1,13 @@
 # @package _global_
+defaults: [/.exp_multi]
 
-defaults:
-  - /.base_multi
-
+# Experiment metadata
 experiment:
+  name: multi-feature-check-example_${now:%Y%m%d}_${now:%H%M%S}}
   description: |
     Compare feature toggle combinations.
 
+# Experiment configuration
 hydra:
   sweeper:
     params:

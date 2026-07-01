@@ -1,5 +1,5 @@
 defaults:
-  - /.base_multi
+  - .exp_multi
   - override /hydra/sweeper: optuna
 
 hydra:

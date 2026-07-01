@@ -1,12 +1,13 @@
 # @package _global_
+defaults: [/.exp_hpo]
 
-defaults:
-  - /.base_hpo
-
+# Experiment metadata
 experiment:
+  name: hpo-sweep-example_${now:%Y%m%d}_${now:%H%M%S}}
   description: |
     Hyperparameter optimization over a number of **estimators** and **feature toggle** of co1.
 
+# Experiment configuration
 hydra:
   sweeper:
     direction: maximize

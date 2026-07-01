@@ -1,0 +1,10 @@
+register_model: null
+experiment:
+  name: null
+  description: ???
+
+run_name: ${oc.select:experiment.name,${hydra:job.name}-${hydra:job.config_name}_${now:%Y%m%d}_${now:%H%M%S}}
+run_description: ${experiment.description}
+hydra:
+  sweep:
+    subdir: ${hydra.job.num}-${hydra.job.override_dirname}

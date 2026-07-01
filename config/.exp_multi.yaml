@@ -1,8 +1,9 @@
-run_name: ${hydra:sweep.subdir}
 register_model: null
 experiment:
+  name: null
   description: ???
 
+run_name: ${hydra:sweep.subdir}
 hydra:
   mode: MULTIRUN
   sweep:
@@ -15,7 +16,7 @@ hydra:
   callbacks:
     parent_run:
       _target_: project.config.ParentRunCallback
-      name: ${hydra.job.name}-${hydra.job.config_name}_${now:%Y%m%d}_${now:%H%M%S}
+      name: ${oc.select:experiment.name,${hydra.job.name}-${hydra.job.config_name}_${now:%Y%m%d}_${now:%H%M%S}}
       description: ${experiment.description}
   sweeper:
     params: ???

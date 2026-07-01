@@ -1,12 +1,13 @@
 # @package _global_
+defaults: [/.exp_single]
 
-defaults:
-  - /.base_single
-
+# Experiment metadata
 experiment:
+  name: feature-check-example_${now:%Y%m%d}_${now:%H%M%S}
   description: |
     Check for improvement without certain features.
 
+# Experiment configuration
 model:
   steps:
     feature_selection:
