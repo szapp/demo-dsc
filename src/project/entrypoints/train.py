@@ -49,7 +49,6 @@ RUN_NAME = "${hydra:job.name}-${hydra:job.config_name}_${now:%Y%m%d}_${now:%H%M%
 @store(
     name="dev",
     hydra_defaults=[
-        {"hydra/job_logging/root/handlers": "console"},
         {"dataloader": "prod"},
         {"dataprocessor": "prod"},
         {"model": "prod"},

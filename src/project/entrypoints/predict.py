@@ -38,7 +38,6 @@ TODAY = date.today().isoformat()
 @store(
     name="dev",
     hydra_defaults=[
-        {"hydra/job_logging/root/handlers": "console"},
         {"dataloader": "prod"},
         {"dataprocessor": "prod"},
         {"model": "champion"},
