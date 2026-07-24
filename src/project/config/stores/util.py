@@ -6,10 +6,10 @@ from typing import Any, Literal
 from hydra_zen import make_custom_builds_fn
 
 __all__ = [
-    "builds",
     "build_columns",
     "build_steps",
     "build_transformers",
+    "builds",
 ]
 
 

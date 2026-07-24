@@ -9,7 +9,7 @@ from project.data.validate.base import DataModelBase, DataModelBaseML
 
 
 class DummyModel(DataModelBase):
-    _pre_rename = {"misspelled": "float32_col"}
+    _pre_rename = {"misspelled": "float32_col"}  # noqa: RUF012
     float_col: pd.Float64Dtype
     float32_col: pd.Float32Dtype
     int_col: pd.Int64Dtype = F(nullable=True)
@@ -147,7 +147,7 @@ class TestDataModelBaseML:
         inputs = pd.DataFrame(
             {
                 "col": ["Foo", "Bar", "Bay"],
-                "col2": ["Foo", 12, dict()],
+                "col2": ["Foo", 12, {}],
             }
         )
         expected = inputs.assign(col=inputs["col"].astype("string").astype("category"))

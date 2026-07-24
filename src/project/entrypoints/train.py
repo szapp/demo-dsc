@@ -1,7 +1,7 @@
 import logging
 import os
 from collections.abc import Callable
-from datetime import date, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import cast
 
 import mlflow
@@ -19,7 +19,7 @@ from ..types import SqlParams
 from ..version import PACKAGE, SERVICE
 
 logger = logging.getLogger(__name__)
-YESTERDAY = (date.today() - timedelta(days=1)).isoformat()
+YESTERDAY = cast(PastDate, (datetime.now(UTC).date() - timedelta(days=1)).isoformat())
 RUN_NAME = "${hydra:job.name}-${hydra:job.config_name}_${now:%Y%m%d}_${now:%H%M%S}"
 
 
@@ -63,7 +63,7 @@ def train(
     dataloader: Callable[[SqlParams], pd.DataFrame],
     dataprocessor: Callable[[pd.DataFrame], tuple[pd.DataFrame, pd.Series]],
     model: Pipeline,
-    training_cutoff: PastDate = cast(PastDate, YESTERDAY),
+    training_cutoff: PastDate = YESTERDAY,
     num_samples: PositiveInt = 365 * 5,
     register_model: str | None = None,
     run_name: str | None = None,

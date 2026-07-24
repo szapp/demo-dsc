@@ -38,7 +38,7 @@ db_store(
         host="localhost",
         port="5432",
         database="mydb",
-        query=dict(),
+        query={},
     ),
     pool_recycle=1800,
     name="prod",
@@ -51,7 +51,7 @@ db_store(
         URL.create,
         drivername="sqlite",
         database=":memory:",
-        query=dict(),
+        query={},
     ),
     name="memory",
 )

@@ -105,8 +105,9 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"**/tests/**/test_*.py" = ["S101"] # assert
-"**/*.ipynb" = ["B018"]            # useless-expression
+"**/tests/**/test_*.py" = ["S101"]     # assert
+"**/*.ipynb" = ["B018"]                # useless-expression
+"src/**/config/stores/*.py" = ["C408"] # unnecessary-collection-call
 
 [tool.ruff.format]
 line-ending = "lf"

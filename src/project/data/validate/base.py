@@ -10,7 +10,7 @@ from pandera.pandas import Field as F
 class DataModelBase(pa.DataFrameModel):
     """Data model base with standard config and column renaming prior to validation."""
 
-    _pre_rename: dict[str, str] = dict()  # Rename selected columns
+    _pre_rename: dict[str, str] = {}  # Rename selected columns  # noqa: RUF012
     index_: pat.Index[int] = F(unique=True, ge=0)  # DataFrame index
 
     class Config:

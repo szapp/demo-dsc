@@ -11,7 +11,7 @@ from .base import DataModelBase
 class RawDataModel(DataModelBase):
     """Data model for raw data."""
 
-    _cat = ["Apple", "Banana", "Cherry", "Date"]
+    _cat = ["Apple", "Banana", "Cherry", "Date"]  # noqa: RUF012
 
     id: pd.Int64Dtype
     date: Annotated[pd.DatetimeTZDtype, "us", "UTC"]

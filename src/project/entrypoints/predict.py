@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Callable
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import cast
 
 import numpy as np
@@ -13,7 +13,7 @@ from ..types import FittedPipeline, SqlParams
 from ..version import PACKAGE, SERVICE
 
 logger = logging.getLogger(__name__)
-TODAY = date.today().isoformat()
+TODAY = cast(date, datetime.now(tz=UTC).date().isoformat())  # Hydra-conform type
 
 
 @sklearn.config_context(transform_output="pandas")
@@ -50,7 +50,7 @@ def predict(
     dataloader: Callable[[SqlParams], pd.DataFrame],
     dataprocessor: Callable[[pd.DataFrame], tuple[pd.DataFrame, pd.Series]],
     model: FittedPipeline,
-    start_date: date = cast(date, TODAY),
+    start_date: date = TODAY,
     num_samples: PositiveInt = 60,
 ) -> np.ndarray:
     """Predict with a model.

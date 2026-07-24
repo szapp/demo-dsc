@@ -1,8 +1,8 @@
 """Data models for validation of raw data and model inputs."""
 
 __all__ = [
-    "RawDataModel",
     "ProcessedDataModel",
+    "RawDataModel",
 ]
 
 from .processed import ProcessedDataModel
