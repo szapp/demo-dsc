@@ -5,5 +5,4 @@ __all__ = [
     "RawDataModel",
 ]
 
-from .processed import ProcessedDataModel
-from .raw import RawDataModel
+from .input import ProcessedDataModel, RawDataModel

@@ -1,10 +1,4 @@
-alias setup := install
-alias sync := install
-alias update := install
-
-# List all commands by default when typing only `just``
-@_default:
-    just --list
+set default-list
 
 #########
 # CHECK #
@@ -59,9 +53,9 @@ check-all: lint test typing check-imports check-testdocs check-complexity check-
 install:
     @-[ -d .git ] || git init
     @-cp -n .env.example .env
-    @-mkdir -p logs
+    @-mkdir -p logs mlruns
     uv sync
-    uv run prek install --install-hooks --overwrite --no-progress
+    uv run prek install --prepare-hooks --overwrite --no-progress
 
 # Reset environment and all cache files
 [group('lifecycle')]
@@ -78,7 +72,7 @@ fresh: clean install
 [group('lifecycle')]
 upgrade python='3.14': (_upgrade_python python)
     uv sync --upgrade
-    uv run prek auto-update --no-progress
+    uv run prek update --no-progress
 
 [arg('python', pattern='^3\.[1-9]\d+$')]
 @_upgrade_python python:

@@ -4,14 +4,13 @@ import pytest
 from dirty_equals import IsTuple
 from inline_snapshot import snapshot
 from pandera.errors import SchemaError
-from pandera.typing.pandas import Series as S
 
 from project.data import process_data
 
 
 class DataModelDummy(pa.DataFrameModel):
-    col1: S[pa.String]
-    target: S[pa.Int64]
+    col1: pd.StringDtype
+    target: pd.Int64Dtype
 
 
 def test_process_data_raises_on_validation_error():

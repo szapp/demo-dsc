@@ -50,7 +50,7 @@ def predict(
     dataloader: Callable[[SqlParams], pd.DataFrame],
     dataprocessor: Callable[[pd.DataFrame], tuple[pd.DataFrame, pd.Series]],
     model: FittedPipeline,
-    start_date: date = TODAY,
+    date_start: date = TODAY,
     num_samples: PositiveInt = 60,
 ) -> np.ndarray:
     """Predict with a model.
@@ -59,14 +59,14 @@ def predict(
         dataloader: Callable to produce data given the SQL parameters.
         dataprocessor: Callable to process and split the data at the target column.
         model: A fitted Scikit-Learn ML pipeline.
-        start_date: Starting date of data.
-        end_date: End date of the data.
+        date_start: Starting date of the prediction window.
+        num_samples: Number of days to predict.
 
     Returns:
         The predicted target column.
     """
-    end_date = start_date + timedelta(days=num_samples - 1)
-    sql_params = {"start_date": start_date, "end_date": end_date}
+    date_end = date_start + timedelta(days=num_samples - 1)
+    sql_params = {"date_start": date_start, "date_end": date_end}
     raw = dataloader(sql_params)
     X, _ = dataprocessor(raw)
 

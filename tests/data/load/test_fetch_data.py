@@ -1,3 +1,5 @@
+from collections.abc import Generator
+
 import pandas as pd
 import pandera.pandas as pa
 import pytest
@@ -7,8 +9,7 @@ from inline_snapshot import snapshot
 from pandas.errors import MergeError
 from pandera.errors import SchemaError
 from pandera.pandas import Field as F
-from pandera.typing.pandas import Series as S
-from sqlalchemy import create_engine
+from sqlalchemy import Engine, create_engine
 
 from project.data import fetch_data
 
@@ -16,14 +17,14 @@ fetch_data_uncached = getattr(fetch_data, "uncached", None) or fetch_data
 
 
 class RawDataModel(pa.DataFrameModel):
-    id: S[pa.Int64]
-    date: S[pa.Timestamp]
-    feature: S[pd.Int64Dtype] = F(nullable=True, coerce=True)  # Nullable integer
-    target: S[pd.Int64Dtype] = F(nullable=True, coerce=True)
+    id: pd.Int64Dtype
+    date: pd.Timestamp
+    feature: pd.Float64Dtype = F(nullable=True)
+    target: pd.Int64Dtype = F(nullable=True, coerce=True)
 
 
 @pytest.fixture(scope="module", name="engine")
-def _engine():
+def _engine() -> Generator[Engine]:
     """Run a data base and fill it with dummy data for the tests."""
     engine = create_engine("sqlite:///:memory:")
 
@@ -93,8 +94,8 @@ def test_fetch_data_left_joins_data_correctly(engine):
         {
             "id": [1, 2, 3, 4],
             "date": IsList(length=4),
-            "feature": [42, 43, None, None],
-            "target": [0, 1, None, 3],
+            "feature": [42, 43, -42, -42],
+            "target": [0, 1, -42, 3],
         }
     )
 
@@ -105,6 +106,7 @@ def test_fetch_data_left_joins_data_correctly(engine):
         data_model=RawDataModel,
     )
 
+    actual = actual.fillna(-42)  # Issues with NaN in inline_snapshot
     assert actual.to_dict("list") == expected
 
 
@@ -170,14 +172,16 @@ def test_fetch_data_raises_on_incorrect_data_type_during_data_model_validation(e
     """The resulting data must match the expected data types."""
     sql_queries = frozendict(
         {
-            "index": "SELECT CAST(id AS VARCHAR) as id, date FROM identifier",
-            "features": "SELECT * FROM feature",
+            "index": "SELECT * FROM identifier",
+            "features": (
+                "SELECT date, id, CAST(feature AS VARCHAR) as feature FROM feature"
+            ),
             "target": "SELECT * FROM target",
         }
     )
     params = {}
 
-    with pytest.raises(SchemaError, match="to have type int"):
+    with pytest.raises(SchemaError, match="expected.*feature.*to have type [fF]loat"):
         fetch_data_uncached(
             params=params,
             db_engine=engine,

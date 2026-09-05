@@ -2,11 +2,12 @@
 dialect = sqlite
 templater = placeholder
 exclude_rules = ambiguous.column_count, structure.column_order
-max_line_length = 88
-processes = -1
+max_line_length = 120
 
 [sqlfluff:templater:placeholder]
 param_style = colon
+date_start = '2025-01-01'
+date_end = '2025-01-01'
 
 [sqlfluff:indentation]
 implicit_indents = allow

@@ -1,15 +1,17 @@
+import logging
 from typing import Annotated
 
 import pandas as pd
 import pytest
-from pandera.errors import SchemaError
+from frozendict import frozendict
+from pandera.errors import SchemaError, SchemaWarning
 from pandera.pandas import Field as F
 
 from project.data.validate.base import DataModelBase, DataModelBaseML
 
 
 class DummyModel(DataModelBase):
-    _pre_rename = {"misspelled": "float32_col"}  # noqa: RUF012
+    _pre_rename = frozendict(misspelled="float32_col")
     float_col: pd.Float64Dtype
     float32_col: pd.Float32Dtype
     int_col: pd.Int64Dtype = F(nullable=True)
@@ -73,10 +75,13 @@ class TestDataModelBase:
         with pytest.raises(SchemaError, match="non_empty"):
             DummyModel.validate(inputs)
 
+    @pytest.mark.filterwarnings(
+        "all:int_col.*at_least_one_value:pandera.errors.SchemaWarning"
+    )
     def test_validate_raises_on_nan_columns(self, df_dummy_base: pd.DataFrame):
         """Data with nan-columns suggest faulty data sources."""
         inputs = df_dummy_base.assign(int_col=pd.NA)
-        with pytest.raises(SchemaError, match="at_least_one_value"):
+        with pytest.warns(SchemaWarning, match="int_col.*at_least_one_value"):
             DummyModel.validate(inputs)
 
     def test_validate_raises_unordered_index(self, df_dummy_base: pd.DataFrame):
@@ -142,17 +147,26 @@ class TestDataModelBaseML:
 
         class DummyModelML(DataModelBaseML):
             col: pd.StringDtype  # Actual string column
-            col2: object  # Object column remains unchanged
 
-        inputs = pd.DataFrame(
-            {
-                "col": ["Foo", "Bar", "Bay"],
-                "col2": ["Foo", 12, {}],
-            }
-        )
+        inputs = pd.DataFrame({"col": ["Foo", "Bar", "Bay"]})
         expected = inputs.assign(col=inputs["col"].astype("string").astype("category"))
         actual = DummyModelML.validate(inputs)
         pd.testing.assert_frame_equal(actual, expected)
+
+    def test_validate_raises_on_invalid_dtypes(self, caplog: pytest.LogCaptureFixture):
+        """Only ML compliant data types are permitted."""
+
+        class DummyModelML(DataModelBaseML):
+            col2: object  # Object column remains unchanged
+
+        inputs = pd.DataFrame({"col2": ["Foo", 12, {}]})
+        with (
+            pytest.raises(SchemaError, match="coerce_data_types"),
+            caplog.at_level(logging.WARNING),
+        ):
+            DummyModelML.validate(inputs)
+
+        assert "nvalid dtypes" in caplog.text
 
     def test_validate_coerces_numerical_columns_to_float64(self):
         """To avoid ambiguity, all numerical types should be promoted to float64."""

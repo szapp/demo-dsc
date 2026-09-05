@@ -4,13 +4,14 @@ from typing import Any
 import pandas as pd
 import pandera.pandas as pa
 import pandera.typing.pandas as pat
+from frozendict import frozendict
 from pandera.pandas import Field as F
 
 
 class DataModelBase(pa.DataFrameModel):
     """Data model base with standard config and column renaming prior to validation."""
 
-    _pre_rename: dict[str, str] = {}  # Rename selected columns  # noqa: RUF012
+    _pre_rename: frozendict[str, str] = frozendict()  # Rename selected columns
     index_: pat.Index[int] = F(unique=True, ge=0)  # DataFrame index
 
     class Config:
@@ -23,7 +24,7 @@ class DataModelBase(pa.DataFrameModel):
         cls.get_logger().debug("Adjust column names")
         return df.rename(columns=cls._pre_rename)
 
-    @pa.check("^.*[^_]$", regex=True, ignore_na=False)
+    @pa.check("^.*[^_]$", regex=True, ignore_na=False, raise_warning=True)
     def has_at_least_one_value(cls, col: pat.Series[Any]) -> bool:
         """Columns with all NaNs suggest faulty data."""
         return col.notna().any() or col.empty
@@ -57,23 +58,32 @@ class DataModelBaseML(DataModelBase):
         """Coerce data types in-place post validation."""
 
         # Normalize datetime columns to microsecond resolution and drop time zone info
-        cls.get_logger().debug("Coerce datetime types")
-        dt = df.select_dtypes(["datetime", "datetimetz"]).columns
+        dt = df.select_dtypes(["datetime", "datetimetz"]).columns.tolist()
+        cls.get_logger().debug("Coerce datetime types", extra={"columns": dt})
         df[dt] = df[dt].apply(lambda x: x.dt.tz_localize(None).dt.as_unit("us"))
 
         # Missing values in booleans are not fully supported by Scikit-Learn
-        cls.get_logger().debug("Impute boolean types")
-        bt = df.select_dtypes("boolean").columns
+        bt = df.select_dtypes("boolean").columns.tolist()
+        cls.get_logger().debug("Impute boolean types", extra={"columns": bt})
         df[bt] = df[bt].fillna(False)  # NaN are set to False(!)
 
         # There should be no string columns, but all categorical
-        cls.get_logger().debug("Coerce categorical types")
-        st = df.select_dtypes("string").columns
+        st = df.select_dtypes("string").columns.tolist()
+        cls.get_logger().debug("Coerce categorical types", extra={"columns": st})
         df[st] = df[st].astype(pd.CategoricalDtype())
 
         # All numerics are promoted to float64 to prevent downstream type conversions
-        cls.get_logger().debug("Coerce numeric types")
-        nt = df.select_dtypes("number").columns
+        nt = df.select_dtypes("number").columns.tolist()
+        cls.get_logger().debug("Coerce numeric types", extra={"columns": nt})
         df[nt] = df[nt].astype(pd.Float64Dtype())
+
+        # Check remaining data types
+        ALLOWED_DTYPES = {"boolean", "category", "datetime64[us]", "Float64"}
+        invalid_dtypes = set(df.dtypes.astype(str)).difference(ALLOWED_DTYPES)
+        if invalid_dtypes:
+            columns = df.select_dtypes(invalid_dtypes).columns.tolist()
+            extra = {"dtypes": list(invalid_dtypes), "columns": columns}
+            cls.get_logger().error("Invalid dtypes", extra=extra)
+            return False
 
         return True

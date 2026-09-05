@@ -1,6 +1,7 @@
 import os
 from typing import Any
 
+import mlflow
 from hydra import TaskFunction
 from hydra.experimental.callback import Callback
 from omegaconf import DictConfig
@@ -20,10 +21,9 @@ class ParentRunCallback(Callback):  # pragma: no cover
 
     def on_multirun_start(self, config: DictConfig, **kwargs: Any) -> None:
         """Start parent run in MLflow before any job."""
-        import mlflow
-
         exp_name = config.hydra.job.env_set.get("MLFLOW_EXPERIMENT_NAME")
-        os.environ.setdefault("MLFLOW_EXPERIMENT_NAME", exp_name or "")
+        exp_name = exp_name or os.environ.get("MLFLOW_EXPERIMENT_NAME")
+        mlflow.set_experiment(exp_name)
         mlflow.start_run(run_name=self.name, description=self.description)
         self._parent_run = mlflow.active_run()
 
@@ -33,8 +33,6 @@ class ParentRunCallback(Callback):  # pragma: no cover
         """Ensure that parent run is active before each job during multi-processing."""
         if self._parent_run is None:
             return
-
-        import mlflow
 
         if mlflow.active_run() != self._parent_run:
             mlflow.end_run()

@@ -8,9 +8,9 @@ numbers as (
 ),
 
 dates as (
-    select date(:start_date, '+' || n || ' days') as 'date'
+    select date(:date_start, '+' || n || ' days') as 'date'
     from numbers
-    where date(:start_date, '+' || n || ' days') <= :end_date
+    where date(:date_start, '+' || n || ' days') <= :date_end
 ),
 
 identifiers as (

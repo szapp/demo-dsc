@@ -149,7 +149,7 @@
             "source.fixAll.markdownlint": "explicit"
         },
         "editor.rulers": [
-            88
+            120
         ],
     },
 }

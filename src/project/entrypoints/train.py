@@ -86,8 +86,8 @@ def train(
     """
     ENV = os.environ.get("ENV")
 
-    start_date = training_cutoff - timedelta(days=num_samples - 1)
-    sql_params = {"start_date": start_date, "end_date": training_cutoff}
+    date_start = training_cutoff - timedelta(days=num_samples - 1)
+    sql_params = {"date_start": date_start, "date_end": training_cutoff}
     raw = dataloader(sql_params)
     X, y = dataprocessor(raw)
 
