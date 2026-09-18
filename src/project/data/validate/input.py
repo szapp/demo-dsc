@@ -1,7 +1,6 @@
 from typing import Annotated
 
 import pandas as pd
-import pandera.pandas as pa
 from pandera.pandas import Field as F
 
 from .base import DataModelBase, DataModelBaseML
@@ -26,14 +25,10 @@ class RawDataModel(DataModelBase):
     col4: Annotated[pd.CategoricalDtype, _CAT, False] = F(nullable=True)
 
     class Config:
-        unique = ("id", "date")
+        unique = ["id", "date"]  # noqa: RUF012
 
 
-class ProcessedDataModel(RawDataModel, DataModelBaseML):
+class ProcessedDataModel(DataModelBaseML, RawDataModel):
     """Data model for processed and ML-conform data."""
 
     # Datatypes from raw data model are coerced to ML-conform types.
-
-    @pa.check("__disabled__", regex=True)
-    def has_at_least_one_value(cls) -> None:
-        """Disabled to avoid duplicated warnings after raw validation before."""

@@ -1,28 +1,24 @@
 import logging
+import warnings
 from typing import Any
 
 import pandas as pd
 import pandera.pandas as pa
 import pandera.typing.pandas as pat
-from frozendict import frozendict
 from pandera.pandas import Field as F
+
+# Only show each distinct violation once
+warnings.filterwarnings("once", r".*at_least_one_value", pa.errors.SchemaWarning)
 
 
 class DataModelBase(pa.DataFrameModel):
     """Data model base with standard config and column renaming prior to validation."""
 
-    _pre_rename: frozendict[str, str] = frozendict()  # Rename selected columns
     index_: pat.Index[int] = F(unique=True, ge=0)  # DataFrame index
 
     class Config:
         strict = "filter"  # Drop extra columns
         coerce = True  # Auto-convert data types where possible
-
-    @pa.dataframe_parser
-    def rename_columns(cls, df: pd.DataFrame) -> pd.DataFrame:
-        """Rename columns of input prior to validation."""
-        cls.get_logger().debug("Adjust column names")
-        return df.rename(columns=cls._pre_rename)
 
     @pa.check("^.*[^_]$", regex=True, ignore_na=False, raise_warning=True)
     def has_at_least_one_value(cls, col: pat.Series[Any]) -> bool:
@@ -65,25 +61,45 @@ class DataModelBaseML(DataModelBase):
         # Missing values in booleans are not fully supported by Scikit-Learn
         bt = df.select_dtypes("boolean").columns.tolist()
         cls.get_logger().debug("Impute boolean types", extra={"columns": bt})
-        df[bt] = df[bt].fillna(False)  # NaN are set to False(!)
+        df[bt] = df[bt].fillna(False).astype("bool")  # NaN are set to False(!)
 
         # There should be no string columns, but all categorical
         st = df.select_dtypes("string").columns.tolist()
-        cls.get_logger().debug("Coerce categorical types", extra={"columns": st})
-        df[st] = df[st].astype(pd.CategoricalDtype())
+        cls.get_logger().debug("Coerce string types", extra={"columns": st})
+        df[st] = df[st].astype("string").astype("category")
 
         # All numerics are promoted to float64 to prevent downstream type conversions
         nt = df.select_dtypes("number").columns.tolist()
         cls.get_logger().debug("Coerce numeric types", extra={"columns": nt})
-        df[nt] = df[nt].astype(pd.Float64Dtype())
+        df[nt] = df[nt].astype("float64")
 
-        # Check remaining data types
-        ALLOWED_DTYPES = {"boolean", "category", "datetime64[us]", "Float64"}
-        invalid_dtypes = set(df.dtypes.astype(str)).difference(ALLOWED_DTYPES)
+        # Categorical columns should have primitive underlying types
+        ct = df.select_dtypes("category").columns.tolist()
+        cls.get_logger().debug("Coerce categorical types", extra={"columns": ct})
+        invalid_cat_types = {}
+        for col in ct:
+            cat = df[col].cat
+            val = cat.categories
+            if pd.api.types.is_datetime64_any_dtype(val):
+                df[col] = cat.rename_categories(val.tz_localize(None).as_unit("us"))
+            elif pd.api.types.is_bool_dtype(val):
+                df[col] = cat.rename_categories(val.astype("bool"))
+            elif pd.api.types.is_string_dtype(val):
+                df[col] = cat.rename_categories(val.astype("string"))
+            elif pd.api.types.is_numeric_dtype(val):
+                df[col] = cat.rename_categories(val.astype("float64"))
+            else:
+                invalid_cat_types[col] = f"category[{val.dtype.name}]"
+
+        # Check/report remaining data types
+        ALLOWED_DTYPES = {"bool", "category", "datetime64[us]", "float64"}
+        dtypes = df.dtypes.astype(str)
+        dtypes[list(invalid_cat_types)] = list(invalid_cat_types.values())
+        invalid_dtypes = set(dtypes).difference(ALLOWED_DTYPES)
         if invalid_dtypes:
-            columns = df.select_dtypes(invalid_dtypes).columns.tolist()
-            extra = {"dtypes": list(invalid_dtypes), "columns": columns}
-            cls.get_logger().error("Invalid dtypes", extra=extra)
+            columns = dtypes[dtypes.isin(invalid_dtypes)].index.tolist()
+            extra = {"columns": columns, "dtypes": list(invalid_dtypes)}
+            cls.get_logger().error("Non-ML-compliant types encountered", extra=extra)
             return False
 
         return True

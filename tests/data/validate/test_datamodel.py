@@ -3,7 +3,6 @@ from typing import Annotated
 
 import pandas as pd
 import pytest
-from frozendict import frozendict
 from pandera.errors import SchemaError, SchemaWarning
 from pandera.pandas import Field as F
 
@@ -11,7 +10,6 @@ from project.data.validate.base import DataModelBase, DataModelBaseML
 
 
 class DummyModel(DataModelBase):
-    _pre_rename = frozendict(misspelled="float32_col")
     float_col: pd.Float64Dtype
     float32_col: pd.Float32Dtype
     int_col: pd.Int64Dtype = F(nullable=True)
@@ -33,13 +31,6 @@ def _df_dummy_base() -> pd.DataFrame:
 
 
 class TestDataModelBase:
-    def test_validate_renames_columns(self, df_dummy_base: pd.DataFrame):
-        """The names of DataFrame columns must be adjustable."""
-        inputs = df_dummy_base.copy().rename(columns={"float32_col": "misspelled"})
-        expected = ["float_col", "float32_col", "int_col", "date_col", "bool_col"]
-        actual = DummyModel.validate(inputs).columns.tolist()
-        assert actual == expected
-
     def test_validate_drops_extra_columns_silently(self, df_dummy_base: pd.DataFrame):
         """Dropping columns is a great way to curate the data to a desired schema."""
         inputs = df_dummy_base.assign(extra_col=[0, 1, 2])
@@ -138,7 +129,7 @@ class TestDataModelBaseML:
             col: pd.BooleanDtype = F(nullable=True)
 
         inputs = pd.DataFrame({"col": [True, False, None]})
-        expected = pd.DataFrame({"col": [True, False, False]}, dtype=pd.BooleanDtype())
+        expected = pd.DataFrame({"col": [True, False, False]}, dtype=bool)
         actual = DummyModelML.validate(inputs)
         pd.testing.assert_frame_equal(actual, expected)
 
@@ -166,7 +157,7 @@ class TestDataModelBaseML:
         ):
             DummyModelML.validate(inputs)
 
-        assert "nvalid dtypes" in caplog.text
+        assert "Non-ML-compliant" in caplog.text
 
     def test_validate_coerces_numerical_columns_to_float64(self):
         """To avoid ambiguity, all numerical types should be promoted to float64."""
@@ -177,6 +168,6 @@ class TestDataModelBaseML:
             col3: pd.Float64Dtype
 
         inputs = pd.DataFrame({"col": [2], "col2": [3], "col3": [4]})
-        expected = inputs.copy().astype(pd.Float64Dtype())
+        expected = inputs.copy().astype(float)
         actual = DummyModelML.validate(inputs)
         pd.testing.assert_frame_equal(actual, expected)

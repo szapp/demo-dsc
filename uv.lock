@@ -1038,15 +1038,15 @@ wheels = [
 
 [[package]]
 name = "hydra-structlog"
-version = "1.0.0"
+version = "1.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "hydra-core" },
     { name = "structlog" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d6/73/f3141165030253c58ca975f1691fdc66a2b712c1a9525ce86f30843abbe4/hydra_structlog-1.0.0.tar.gz", hash = "sha256:5f632054ba88a09903b21a98c5b127a8239923c4cbaa8a1b54d7bdb82acdbf20", size = 8190, upload-time = "2026-07-24T13:59:54.543Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7a/40/cd7f33706ce8493e72eab2f8afc9ccf88c709b97ab5d23f60423cb81f749/hydra_structlog-1.0.2.tar.gz", hash = "sha256:b3d940fe665ee61ff7b4b4c82a9e4aed31b97179e25d04e776b71bd0cba01449", size = 8543, upload-time = "2026-09-08T08:08:40.522Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/40/e6/0cdd3c9640ab19cf4f8804496d8e22fb260155ff4094ece75a3a12a83b62/hydra_structlog-1.0.0-py3-none-any.whl", hash = "sha256:f4bc82364885bbb90b14b7068758f2cd893023dcfce4b9eef30a22a1ae159fdb", size = 11152, upload-time = "2026-07-24T13:59:53.491Z" },
+    { url = "https://files.pythonhosted.org/packages/fb/3c/0e9844c4264ebe4d427ab06733f660af89a42172c3d20d885fad6c5623b5/hydra_structlog-1.0.2-py3-none-any.whl", hash = "sha256:de9b549fab28d97e74b9363ec6c3e62f442c4ce8fe5017ca5ca39c0917cea1d2", size = 11269, upload-time = "2026-09-08T08:08:39.387Z" },
 ]
 
 [[package]]
@@ -2121,7 +2121,7 @@ wheels = [
 
 [[package]]
 name = "pandera"
-version = "0.32.1"
+version = "0.33.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "packaging" },
@@ -2130,9 +2130,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "typing-inspect" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/98/74/7ef34611e49990b7e630dcf02c2225d76c2e328ec2804186c2b9c52e916b/pandera-0.32.1.tar.gz", hash = "sha256:72ecd74226847abf0f0437c05f7f10cc8368e306d88a2acc78fa93762c5a0a02", size = 875349, upload-time = "2026-06-29T16:01:48.72Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/47/7a/702612a2b5e3335722395d6de71206549f64a43588527f411ff60a7c3456/pandera-0.33.1.tar.gz", hash = "sha256:909e2e269a3f9c17d94c11268f92a5f48e889af633ea1414053993874d613626", size = 976019, upload-time = "2026-09-01T15:56:07.34Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ca/d0/411c82285a7586e97326020f6b5ecbc2f2ffcbef72aa108c897de1b0a540/pandera-0.32.1-py3-none-any.whl", hash = "sha256:1a17a3ffa906174d19207715f4f082ec3db3709647927ad8c095c147d74d8454", size = 447840, upload-time = "2026-06-29T16:01:46.877Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/84/107a480f7aa34a6878fb4fb85cda66f37e8aaee769c5917e3eaa2d55222e/pandera-0.33.1-py3-none-any.whl", hash = "sha256:8283bc12f7c85f0b429107d71b55150205f7e5ca59d68117aff971273a3bd2d8", size = 501976, upload-time = "2026-09-01T15:56:05.944Z" },
 ]
 
 [package.optional-dependencies]
@@ -2354,7 +2354,7 @@ requires-dist = [
     { name = "hydra-colorlog", specifier = ">=1.2.0" },
     { name = "hydra-core", specifier = ">=1.3.2" },
     { name = "hydra-optuna-sweeper", specifier = ">=1.2.0" },
-    { name = "hydra-structlog", specifier = ">=1.0.0" },
+    { name = "hydra-structlog", specifier = ">=1.0.2" },
     { name = "hydra-zen", specifier = ">=0.16.0" },
     { name = "joblib", specifier = ">=1.5.3" },
     { name = "joblib-typed-cache", specifier = ">=0.1.0" },
@@ -2363,7 +2363,7 @@ requires-dist = [
     { name = "omegaconf", specifier = ">=2.3.0" },
     { name = "optuna", specifier = ">=4.7.0" },
     { name = "pandas", specifier = ">=2.3.3" },
-    { name = "pandera", extras = ["pandas"], specifier = ">=0.27.1" },
+    { name = "pandera", extras = ["pandas"], specifier = ">=0.33.1" },
     { name = "pip", specifier = ">=25.3" },
     { name = "psycopg2-binary", specifier = ">=2.9.11" },
     { name = "pyarrow", specifier = ">=23.0.1" },
