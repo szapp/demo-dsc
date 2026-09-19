@@ -3,6 +3,7 @@
 import glob
 import logging
 import os
+from collections.abc import Sequence
 from pathlib import Path
 
 import pandas as pd
@@ -69,6 +70,7 @@ def fetch_data(
     sql_queries: frozendict[str, str],
     *,
     data_model: type[pa.DataFrameModel] = RawDataModel,
+    date_col: Sequence[str] = ("date",),
 ) -> pd.DataFrame:
     """Fetch all data from the database based on index-bound SQL queries.
 
@@ -79,6 +81,7 @@ def fetch_data(
         db_engine: Database connection engine.
         sql_queries: Name-query pairs to fetch.
         data_model: Data model for validation and conversion.
+        date_col: List of any possibly appearing datetime-columns to parse.
 
     Returns:
         DataFrame with collected data from all sources.
@@ -88,33 +91,33 @@ def fetch_data(
         cache can be cleared by invoking `fetch_data.clear()`.
     """
     queries = dict(sql_queries)
-    date_col = ["date"]  # Any possibly appearing date-columns
 
-    # Format parameters for logging
+    # Fetch index first and construct identifiers with cross-join for later left-joins
+    idx_queries = [name for name in queries if name.startswith("index")]
+    if not idx_queries:
+        raise KeyError("At least one index SQL query expected")
     bind_contextvars(**{k: str(v) for k, v in params.items()})
-
-    # Fetch index with identifiers first
-    bind_contextvars(query_name="index")
-    logger.debug("Fetch index")
-    stmt = bind_sql_params(queries.pop("index"), **params)
-    index = pd.read_sql(stmt, db_engine, parse_dates=date_col)
-    identifiers = index.columns.to_list()
-    index = index.set_index(identifiers)
-
-    # Fetch and left join the feature and target columns on the identifiers
-    dfs: list[pd.DataFrame] = []
-    for name, query in tqdm(queries.items(), desc="Load queries"):
+    index = pd.Series(1).to_frame(name="_empty")
+    for name in idx_queries:
         bind_contextvars(query_name=name)
-        logger.debug(f"Fetch {name}")
-        dfs.append(
-            pd.read_sql(
-                bind_sql_params(query, **params),
-                db_engine,
-                index_col=identifiers,
-                parse_dates=date_col,
-            )
-        )
-    unbind_contextvars("query_name", *list(params))
+        logger.debug("Fetch data from database")
+        stmt = bind_sql_params(queries.pop(name), **params)
+        data = pd.read_sql_query(stmt, db_engine, parse_dates=list(date_col))
+        index = index.merge(data, how="cross")
+    unbind_contextvars("query_name")
+    index = index.drop(columns="_empty")
+    identifiers = index.columns.tolist()
+
+    # Fetch and left-join the feature and target columns on the identifiers
+    dfs: list[pd.DataFrame] = []
+    for name, query in tqdm(queries.items(), desc="Load data"):
+        bind_contextvars(query_name=name)
+        logger.debug("Fetch data from database")
+        stmt = bind_sql_params(query, **params)
+        data = pd.read_sql_query(stmt, db_engine, parse_dates=list(date_col))
+        dfs.append(index.merge(data, validate="m:1").set_index(identifiers))
+    unbind_contextvars("query_name", *params)
+    index = index.set_index(identifiers).sort_index()
     df = index.join(dfs, validate="1:1").reset_index()
 
     logger.info("Validate raw data", extra={"num_samples": len(df)})

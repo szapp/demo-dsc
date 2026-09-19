@@ -112,11 +112,6 @@ ignore = [
 [tool.ruff.format]
 line-ending = "lf"
 
-[tool.ty.src]
-exclude = [
-    "src/**/legacy", # Skip legacy code
-]
-
 [tool.pytest]
 norecursedirs = [
     ".*",          # pytest default
@@ -125,6 +120,7 @@ norecursedirs = [
 ]
 timeout = "180" # Alert on hanging tests
 strict_xfail = true # Error on successful tests that should fail
+filterwarnings = ["error"] # Warnings suggest code that is about to break
 addopts = [
     "-ra",                     # More insights
     "-vv",                     # Show parametrized test names
@@ -169,13 +165,7 @@ exclude = ["*.cache"]
 style = "google"
 
 [tool.complexipy]
-paths = ["src", "tests"] # Cognitive complexity: How intuitive is a function for humans.
+paths = ["src", "tests"]    # Cognitive complexity: How intuitive is a function for humans.
 max-complexity-allowed = 10
 failed = true
-exclude = [
-    "project/data/legacy",        # No glob patterns supported
-    "project/entrypoints/legacy",
-    "project/features/legacy",
-    "project/models/legacy",
-    "project/util/legacy",
-]
+exclude = ["**/legacy/**"]

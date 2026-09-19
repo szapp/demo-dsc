@@ -30,17 +30,17 @@ def _engine() -> Generator[Engine]:
 
     data = pd.DataFrame(
         {
-            "id": [1, 2, 3, 4],
-            "date": pd.date_range("2026-01-01", "2026-01-04"),
-            "feature": [42, 43, 44, 45],
-            "target": [0, 1, 2, 3],
+            "id": [1, 1, 2, 2, 3, 3],
+            "date": pd.date_range("2026-01-01", "2026-01-02").tolist() * 3,
+            "feature": [42.0, 43.0, 44.0, 45.0, 46.0, 47.0],
+            "target": [0, 1, 2, 3, 4, 5],
         }
     )
 
     # Add the data with missing values for features and target
     data[["id", "date"]].to_sql("identifier", engine, index=False)
-    data.loc[[0, 1], ["id", "date", "feature"]].to_sql("feature", engine, index=False)
-    data.loc[[0, 1, 3], ["id", "date", "target"]].to_sql("target", engine, index=False)
+    data.loc[::2, ["id", "date", "feature"]].to_sql("feature", engine, index=False)
+    data.loc[[0, 2, 3], ["id", "date", "target"]].to_sql("target", engine, index=False)
 
     yield engine
 
@@ -58,15 +58,15 @@ def test_fetch_data_parametrizes_queries_correctly(engine):
     )
     params = {
         "valid_ids": (1, 2),  # Test expanded parameter binding
-        "min_feature": 40,
+        "min_feature": 44,
         "extra_param": "unused",  # Test that unused parameters are no problem
     }
     expected = snapshot(
         {
-            "id": [1, 2],
-            "date": IsList(length=2),
-            "feature": [42, 43],
-            "target": [0, 1],
+            "id": [1, 1, 2, 2],
+            "date": IsList(length=4),
+            "feature": [-42, -42, 44, -42],
+            "target": [0, -42, 2, 3],
         }
     )
 
@@ -77,6 +77,7 @@ def test_fetch_data_parametrizes_queries_correctly(engine):
         data_model=RawDataModel,
     )
 
+    actual = actual.fillna(-42)  # Issues with NaN in inline_snapshot
     assert actual.to_dict("list") == expected
 
 
@@ -92,10 +93,41 @@ def test_fetch_data_left_joins_data_correctly(engine):
     params = {}
     expected = snapshot(
         {
-            "id": [1, 2, 3, 4],
-            "date": IsList(length=4),
-            "feature": [42, 43, -42, -42],
-            "target": [0, 1, -42, 3],
+            "id": [1, 1, 2, 2, 3, 3],
+            "date": IsList(length=6),
+            "feature": [42, -42, 44, -42, 46, -42],
+            "target": [0, -42, 2, 3, -42, -42],
+        }
+    )
+
+    actual = fetch_data_uncached(
+        params=params,
+        db_engine=engine,
+        sql_queries=sql_queries,
+        data_model=RawDataModel,
+    )
+
+    actual = actual.fillna(-42)  # Issues with NaN in inline_snapshot
+    assert actual.to_dict("list") == expected
+
+
+def test_fetch_data_cross_joins_multiple_indices_correctly(engine):
+    """Multiple identifiers are cross joined allowing to construct a complex index."""
+    sql_queries = frozendict(
+        {
+            "index_a": "SELECT distinct id FROM identifier",
+            "index_b": "SELECT distinct date FROM identifier",
+            "features": "SELECT * FROM feature",
+            "target": "SELECT * FROM target",
+        }
+    )
+    params = {}
+    expected = snapshot(
+        {
+            "id": [1, 1, 2, 2, 3, 3],
+            "date": IsList(length=6),
+            "feature": [42, -42, 44, -42, 46, -42],
+            "target": [0, -42, 2, 3, -42, -42],
         }
     )
 
