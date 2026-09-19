@@ -75,6 +75,15 @@ class TestDataModelBase:
         with pytest.warns(SchemaWarning, match="int_col.*at_least_one_value"):
             DummyModel.validate(inputs)
 
+    @pytest.mark.filterwarnings(
+        "all:int_col.*non_zero_variance:pandera.errors.SchemaWarning"
+    )
+    def test_validate_raises_on_zero_variance(self, df_dummy_base: pd.DataFrame):
+        """Data with no variance suggest flat data sources."""
+        inputs = df_dummy_base.assign(int_col=1)
+        with pytest.warns(SchemaWarning, match="int_col.*non_zero_variance"):
+            DummyModel.validate(inputs)
+
     def test_validate_raises_unordered_index(self, df_dummy_base: pd.DataFrame):
         """A unordered DataFrame index risks mistakes during ML pipeline joins."""
         inputs = df_dummy_base.iloc[[2, 0, 1]]
@@ -89,8 +98,8 @@ class TestDataModelBaseML:
         class DummyModelML(DataModelBaseML):
             col: Annotated[pd.DatetimeTZDtype, "us", "UTC"]
 
-        date_before = pd.to_datetime(["2025-04-02T03:00:00+02:00"]).as_unit("us")
-        date_after = pd.to_datetime(["2025-04-02T01:00:00"]).as_unit("us")
+        date_before = pd.date_range("2025-04-02T03:00:00+02:00", periods=2, unit="us")
+        date_after = pd.date_range("2025-04-02T01:00:00", periods=2, unit="us")
         inputs = pd.DataFrame({"col": date_before})
         expected = pd.DataFrame({"col": date_after})
         actual = DummyModelML.validate(inputs)
@@ -102,8 +111,8 @@ class TestDataModelBaseML:
         class DummyModelML(DataModelBaseML):
             col: pd.Timestamp
 
-        date_before = pd.to_datetime(["2025-04-02"]).as_unit("ns")
-        date_after = pd.to_datetime(["2025-04-02"]).as_unit("us")
+        date_before = pd.date_range("2025-04-02", periods=2, unit="ns")
+        date_after = pd.date_range("2025-04-02", periods=2, unit="us")
         inputs = pd.DataFrame({"col": date_before})
         expected = pd.DataFrame({"col": date_after})
         actual = DummyModelML.validate(inputs)
@@ -115,8 +124,8 @@ class TestDataModelBaseML:
         class DummyModelML(DataModelBaseML):
             col: Annotated[pd.DatetimeTZDtype, "us", "UTC"]
 
-        date_before = pd.to_datetime(["2025-04-02"]).as_unit("ns")
-        date_after = pd.to_datetime(["2025-04-02"]).as_unit("us")
+        date_before = pd.date_range("2025-04-02", periods=2, unit="ns")
+        date_after = pd.date_range("2025-04-02", periods=2, unit="us")
         inputs = pd.DataFrame({"col": date_before})
         expected = pd.DataFrame({"col": date_after})
         actual = DummyModelML.validate(inputs)
@@ -133,7 +142,7 @@ class TestDataModelBaseML:
         actual = DummyModelML.validate(inputs)
         pd.testing.assert_frame_equal(actual, expected)
 
-    def test_validate_coerces_categorical_columns(self):
+    def test_validate_coerces_string_columns(self):
         """To avoid ambiguity, any strings columns should become categorical."""
 
         class DummyModelML(DataModelBaseML):
@@ -148,9 +157,9 @@ class TestDataModelBaseML:
         """Only ML compliant data types are permitted."""
 
         class DummyModelML(DataModelBaseML):
-            col2: object  # Object column remains unchanged
+            col1: object
 
-        inputs = pd.DataFrame({"col2": ["Foo", 12, {}]})
+        inputs = pd.DataFrame({"col1": ["Foo", 12, ()]})
         with (
             pytest.raises(SchemaError, match="coerce_data_types"),
             caplog.at_level(logging.WARNING),
@@ -163,11 +172,65 @@ class TestDataModelBaseML:
         """To avoid ambiguity, all numerical types should be promoted to float64."""
 
         class DummyModelML(DataModelBaseML):
-            col: pd.UInt32Dtype
-            col2: pd.Float32Dtype
-            col3: pd.Float64Dtype
+            c1: int
+            c2: pd.UInt8Dtype
+            c3: pd.UInt32Dtype
+            c4: pd.UInt64Dtype
+            c5: pd.Int8Dtype
+            c6: pd.Int32Dtype
+            c7: pd.Int64Dtype
+            c8: pd.Float32Dtype
+            c9: pd.Float64Dtype
 
-        inputs = pd.DataFrame({"col": [2], "col2": [3], "col3": [4]})
+        inputs = pd.DataFrame(dict.fromkeys(DummyModelML.to_schema().columns, (4, 5)))
         expected = inputs.copy().astype(float)
         actual = DummyModelML.validate(inputs)
         pd.testing.assert_frame_equal(actual, expected)
+
+    def test_validate_coerces_categorical_types(self):
+        """Categorical types should be primitive, too."""
+
+        DATES = pd.date_range("2025-01-01", periods=2, unit="ns", tz="Europe/Berlin")
+
+        class DummyModelML(DataModelBaseML):
+            c1: pd.CategoricalDtype
+            c2: pd.CategoricalDtype
+            c3: pd.CategoricalDtype
+            c4: pd.CategoricalDtype
+            c5: pd.CategoricalDtype
+
+        inputs = pd.DataFrame(
+            {
+                "c1": [1, 2],
+                "c2": [1.0, 2.0],
+                "c3": ["hello", "world"],
+                "c4": [False, True],
+                "c5": DATES,
+            }
+        )
+        expected = {
+            "c1": pd.CategoricalDtype(inputs["c1"].astype("float64"), False),
+            "c2": pd.CategoricalDtype(inputs["c2"].astype("float64"), False),
+            "c3": pd.CategoricalDtype(inputs["c3"].astype("string"), False),
+            "c4": pd.CategoricalDtype(inputs["c4"].astype("bool"), False),
+            "c5": pd.CategoricalDtype(DATES.tz_localize(None).as_unit("us"), False),
+        }
+        actual = DummyModelML.validate(inputs).dtypes.to_dict()
+        assert actual == expected
+
+    def test_validate_raises_on_invalid_categorical_types(
+        self, caplog: pytest.LogCaptureFixture
+    ):
+        """Only ML compliant data types are permitted."""
+
+        class DummyModelML(DataModelBaseML):
+            col1: pd.CategoricalDtype
+
+        inputs = pd.DataFrame({"col1": ["Foo", 12]})
+        with (
+            pytest.raises(SchemaError, match="coerce_data_types"),
+            caplog.at_level(logging.WARNING),
+        ):
+            DummyModelML.validate(inputs)
+
+        assert "Non-ML-compliant" in caplog.text

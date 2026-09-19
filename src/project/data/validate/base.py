@@ -12,9 +12,9 @@ warnings.filterwarnings("once", r".*at_least_one_value", pa.errors.SchemaWarning
 
 
 class DataModelBase(pa.DataFrameModel):
-    """Data model base with standard config and column renaming prior to validation."""
+    """Data model base with standard config and basic validation."""
 
-    index_: pat.Index[int] = F(unique=True, ge=0)  # DataFrame index
+    index_: pat.Index[int] = F(unique=True, ge=0)  # Force generic DataFrame index
 
     class Config:
         strict = "filter"  # Drop extra columns
@@ -24,6 +24,11 @@ class DataModelBase(pa.DataFrameModel):
     def has_at_least_one_value(cls, col: pat.Series[Any]) -> bool:
         """Columns with all NaNs suggest faulty data."""
         return col.notna().any() or col.empty
+
+    @pa.check("^.*[^_]$", regex=True, raise_warning=True)
+    def has_non_zero_variance(cls, col: pat.Series[Any]) -> bool:
+        """Columns with no variance suggest flat data."""
+        return col.nunique() > 1 or col.empty
 
     @pa.check(index_, ignore_na=False)
     def index_is_monotonically_increasing(cls, idx: pat.Index[int]) -> bool:
@@ -46,7 +51,7 @@ class DataModelBaseML(DataModelBase):
     """Data model base enforcing ML conform data types after validation.
 
     Allowed data types to provide a deterministic and reproducible ML context are
-    Float64, Boolean, Categorical, Datetime.
+    bool, category, datetime64, and float64.
     """
 
     @pa.dataframe_check
