@@ -33,7 +33,7 @@ hydra_store(
                 "MLFLOW_CONFIGURE_LOGGING": "0",
                 "MLFLOW_EXPERIMENT_NAME": SERVICE,
                 "MLFLOW_TRACKING_URI": "sqlite:///${hydra.runtime.cwd}/mlflow.db",
-                "_MLFLOW_SERVER_ARTIFACT_ROOT": "file:///${hydra.runtime.cwd}/mlruns",
+                "_MLFLOW_SERVER_ARTIFACT_ROOT": "file://${hydra.runtime.cwd}/mlruns",
             },
         ),
         job_logging={

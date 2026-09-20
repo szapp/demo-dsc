@@ -1,8 +1,10 @@
 import logging
+import re
 from typing import Annotated
 
 import pandas as pd
 import pytest
+from dirty_equals import IsStr
 from pandera.errors import SchemaError, SchemaWarning
 from pandera.pandas import Field as F
 
@@ -119,7 +121,7 @@ class TestDataModelBaseML:
         pd.testing.assert_frame_equal(actual, expected)
 
     def test_validate_coerces_datetime_resolution(self):
-        """MLflow does not support time zone information."""
+        """From pandas 3.0 the default datetime resolution is microseconds."""
 
         class DummyModelML(DataModelBaseML):
             col: Annotated[pd.DatetimeTZDtype, "us", "UTC"]
@@ -166,7 +168,9 @@ class TestDataModelBaseML:
         ):
             DummyModelML.validate(inputs)
 
-        assert "Non-ML-compliant" in caplog.text
+        assert caplog.text == IsStr(
+            regex=".*non.ml.compliant.*", regex_flags=re.IGNORECASE | re.DOTALL
+        )
 
     def test_validate_coerces_numerical_columns_to_float64(self):
         """To avoid ambiguity, all numerical types should be promoted to float64."""
@@ -233,4 +237,47 @@ class TestDataModelBaseML:
         ):
             DummyModelML.validate(inputs)
 
-        assert "Non-ML-compliant" in caplog.text
+        assert caplog.text == IsStr(
+            regex=".*non.ml.compliant.*", regex_flags=re.IGNORECASE | re.DOTALL
+        )
+
+    def test_validate_sorts_by_identifiers(self):
+        """ML datasets should have deterministic row order if they have ID columns."""
+
+        class DummyModelML(DataModelBaseML):
+            c1: float
+            c2: float
+            c3: float
+
+            class Config:
+                unique = ["c2", "c3"]  # noqa: RUF012
+
+        inputs = pd.DataFrame(
+            {"c1": [1, 2, 3, 4], "c2": [3, 1, 2, 1], "c3": [2, 4, 1, 3]},
+            index=pd.Index([67, 42, 60, 3]),
+            dtype=float,
+        )
+        expected = pd.DataFrame(
+            {"c1": [4, 2, 3, 1], "c2": [1, 1, 2, 3], "c3": [3, 4, 1, 2]},  # Sorted
+            index=pd.RangeIndex(4),  # Sorted index
+            dtype=float,
+        )
+        actual = DummyModelML.validate(inputs)
+        pd.testing.assert_frame_equal(actual, expected)
+
+    def test_validate_does_not_sort_if_no_identifiers_are_set(self):
+        """ML datasets should have at least an ordered range-index."""
+
+        class DummyModelML(DataModelBaseML):
+            c1: float
+            c2: float
+            c3: float
+
+        inputs = pd.DataFrame(
+            {"c1": [1, 2, 3, 4], "c2": [3, 1, 2, 1], "c3": [2, 4, 1, 3]},
+            index=pd.Index([67, 42, 60, 3]),
+            dtype=float,
+        )
+        expected = inputs.reset_index(drop=True)
+        actual = DummyModelML.validate(inputs)
+        pd.testing.assert_frame_equal(actual, expected)

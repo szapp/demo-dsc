@@ -1,5 +1,6 @@
 import logging
 import os
+import warnings
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from typing import cast
@@ -9,6 +10,7 @@ import pandas as pd
 import sklearn
 from mlflow.data.pandas_dataset import from_pandas
 from mlflow.models import infer_signature
+from pandera.errors import SchemaWarning
 from pydantic import PastDate, PositiveInt
 from sklearn.pipeline import Pipeline
 from sklearn.utils import estimator_html_repr
@@ -84,15 +86,18 @@ def train(
     Returns:
         The score of the evaluated fit.
     """
+    logger.info("Start")
     ENV = os.environ.get("ENV")
+    warnings.filterwarnings("once", r".*at_least_one_value", SchemaWarning)
 
     date_start = training_cutoff - timedelta(days=num_samples - 1)
     sql_params = {"date_start": date_start, "date_end": training_cutoff}
     raw = dataloader(sql_params)
-    X, y = dataprocessor(raw)
 
-    logger.debug("Write raw data")
+    logger.debug("Write raw data", extra={"num_rows": len(raw)})
     raw.to_parquet("raw.parquet", index=False, compression="zstd")
+
+    X, y = dataprocessor(raw)
 
     with mlflow.start_run(
         run_name=run_name, description=run_description, nested=True
@@ -118,8 +123,9 @@ def train(
             registered_model_name=register_model,
             serialization_format="skops",
             skops_trusted_types=[
-                "numpy.dtype",
+                "numpy.dtype",  # skops-dev/skops/issues/450
                 "sklearn.compose._column_transformer.make_column_selector",
+                "sklearn.tree._tree.Tree",  # scikit-learn/scikit-learn/pull/34558
             ],
         )
         mlflow.log_metric("train_score", score, model_id=mi.model_id, dataset=dataset)
@@ -137,10 +143,10 @@ def train(
         )
         unbind_contextvars("model.name", "model.version")
 
-    if ENV == "dev":
-        logger.debug("Write transformed data for debugging")
-        y_transform = model[:-1].transform(X)
-        y_transform.to_parquet("transformed.parquet", index=False, compression="zstd")
+    logger.info(
+        "Finished successfully",
+        extra={"event.type": "healthcheck", "event.status": "success"},
+    )
 
     return score
 

@@ -28,3 +28,7 @@ extended_capitalisation_policy = lower
 
 [sqlfluff:rules:convention.not_equal]
 preferred_not_equal_style = c_style
+
+[sqlfluff:rules:layout.long_lines]
+ignore_comment_lines = True
+ignore_comment_clauses = True

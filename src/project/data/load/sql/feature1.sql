@@ -1,5 +1,7 @@
 with
-base (n) as (values (0), (1), (2), (3), (4), (5), (6), (7), (8), (9)),
+base (n) as (
+    values (0), (1), (2), (3), (4), (5), (6), (7), (8), (9)
+),
 
 numbers as (
     select bsa.n + 10 * bsb.n as n
@@ -39,5 +41,4 @@ select
         when 3 then 'Date'
     end as col4
 from identifiers as idn
-cross join dates as dte
-order by idn.identifier, dte.date;
+cross join dates as dte;
