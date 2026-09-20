@@ -18,7 +18,7 @@ from structlog.contextvars import bind_contextvars, unbind_contextvars
 
 from ..config import make_cli, store
 from ..types import SqlParams
-from ..version import PACKAGE, SERVICE
+from ..version import PACKAGE, SERVICE, VERSION
 
 logger = logging.getLogger(__name__)
 YESTERDAY = cast(PastDate, (datetime.now(UTC).date() - timedelta(days=1)).isoformat())
@@ -66,7 +66,7 @@ def train(
     dataprocessor: Callable[[pd.DataFrame], tuple[pd.DataFrame, pd.Series]],
     model: Pipeline,
     training_cutoff: PastDate = YESTERDAY,
-    num_samples: PositiveInt = 365 * 5,
+    num_days: PositiveInt = 365 * 5,
     register_model: str | None = None,
     run_name: str | None = None,
     run_description: str | None = None,
@@ -78,7 +78,7 @@ def train(
         dataprocessor: Callable to process and split the data at the target column.
         model: Scikit-Learn ML pipeline.
         training_cutoff: End date of training data.
-        num_samples: Number of days to include in training.
+        num_days: Number of days to include in training.
         register_model: Name of the MLflow model or None to skip.
         run_name: Name of the MLflow run.
         run_description: Description of the MLflow run.
@@ -86,18 +86,19 @@ def train(
     Returns:
         The score of the evaluated fit.
     """
-    logger.info("Start")
+    extra = {"training_cutoff": str(training_cutoff), "num_days": num_days}
+    logger.info("Start", extra=extra)
     ENV = os.environ.get("ENV")
     warnings.filterwarnings("once", r".*at_least_one_value", SchemaWarning)
 
-    date_start = training_cutoff - timedelta(days=num_samples - 1)
+    date_start = training_cutoff - timedelta(days=num_days - 1)
     sql_params = {"date_start": date_start, "date_end": training_cutoff}
     raw = dataloader(sql_params)
-
-    logger.debug("Write raw data", extra={"num_rows": len(raw)})
     raw.to_parquet("raw.parquet", index=False, compression="zstd")
 
     X, y = dataprocessor(raw)
+
+    # TODO cross-validation, native model, and metrics
 
     with mlflow.start_run(
         run_name=run_name, description=run_description, nested=True
@@ -110,11 +111,13 @@ def train(
         logger.debug("Log MLflow run")
         dataset = from_pandas(X)
         html = "<head><meta charset='UTF-8'></head>" + estimator_html_repr(model)
-        mlflow.set_tags({"env": ENV, "training_cutoff": str(training_cutoff)})
         mlflow.log_text(html, "estimator.html")
         mlflow.log_artifacts(".hydra", "hydra")
         mlflow.log_input(dataset, context="Train")
         mlflow.log_params(model.get_params() | {"steps": None})
+        mlflow.set_tags(
+            {"env": ENV, "code": VERSION, "training_cutoff": str(training_cutoff)}
+        )
         mi = mlflow.sklearn.log_model(
             model,
             name="model",

@@ -29,8 +29,8 @@ def process_data(
     logger.debug("Preprocess raw data")
     processed = raw.copy()
 
-    # Validation and ML-conform conversion
-    logger.debug("Validate processed data")
+    # Validation, ML-compliant conversion, and X/y split
+    logger.info("Validate processed data", extra={"num_samples": len(processed)})
     X = data_model.validate(processed)
     y = X.pop(target_column)
 

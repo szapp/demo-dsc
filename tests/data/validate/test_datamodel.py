@@ -151,7 +151,7 @@ class TestDataModelBaseML:
             col: pd.StringDtype  # Actual string column
 
         inputs = pd.DataFrame({"col": ["Foo", "Bar", "Bay"]})
-        expected = inputs.assign(col=inputs["col"].astype("string").astype("category"))
+        expected = inputs.assign(col=inputs["col"].astype("str").astype("category"))
         actual = DummyModelML.validate(inputs)
         pd.testing.assert_frame_equal(actual, expected)
 
@@ -215,7 +215,7 @@ class TestDataModelBaseML:
         expected = {
             "c1": pd.CategoricalDtype(inputs["c1"].astype("float64"), False),
             "c2": pd.CategoricalDtype(inputs["c2"].astype("float64"), False),
-            "c3": pd.CategoricalDtype(inputs["c3"].astype("string"), False),
+            "c3": pd.CategoricalDtype(inputs["c3"].astype("str"), False),
             "c4": pd.CategoricalDtype(inputs["c4"].astype("bool"), False),
             "c5": pd.CategoricalDtype(DATES.tz_localize(None).as_unit("us"), False),
         }

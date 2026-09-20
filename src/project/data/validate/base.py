@@ -79,7 +79,7 @@ class DataModelBaseML(DataModelBase):
         # There should be no string columns, but all categorical
         st = df.select_dtypes("string").columns.tolist()
         cls.get_logger().debug("Coerce string types", extra={"columns": st})
-        df[st] = df[st].astype("string").astype("category")
+        df[st] = df[st].astype("str").astype("category")
 
         # All numerics are promoted to float64 to prevent downstream type conversions
         nt = df.select_dtypes("number").columns.tolist()
@@ -99,7 +99,7 @@ class DataModelBaseML(DataModelBase):
             elif pd.api.types.is_bool_dtype(val):
                 df[col] = cat.rename_categories(val.astype("bool"))
             elif pd.api.types.is_string_dtype(val):
-                df[col] = cat.rename_categories(val.astype(str))
+                df[col] = cat.rename_categories(val.astype("str"))  # Native string
             elif pd.api.types.is_numeric_dtype(val):
                 df[col] = cat.rename_categories(val.astype("float64"))
             else:
