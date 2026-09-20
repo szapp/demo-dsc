@@ -108,8 +108,9 @@ experiment name:
 
 # Run local mlflow server
 [group('development')]
-mlflow:
-    uv run mlflow ui
+mlflow port='5000':
+    uv run -m webbrowser -t http://127.0.0.1:{{ port }}
+    uv run mlflow ui -p {{ port }}
 
 # Create a new analysis notebook
 [group('development')]

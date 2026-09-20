@@ -32,6 +32,15 @@ model_store(
 )
 
 
+# Improve representation of make_column_selector for run comparisons in MLflow
+def make_column_selector_repr(self):  # pragma: no cover
+    param_pairs = [f"{k}={v!r}" for k, v in self.__dict__.items() if v is not None]
+    return f"{type(self).__name__}({', '.join(param_pairs)})"
+
+
+make_column_selector.__repr__ = make_column_selector_repr
+
+
 # Preprocessing step
 preprocessing = builds(
     ColumnTransformer,
