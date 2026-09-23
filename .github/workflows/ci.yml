@@ -41,6 +41,9 @@ jobs:
       - name: Format
         run: uv run ruff format --diff
 
+      - name: Lint SQL
+        run: uv run sqlfluff lint --disable-progress-bar --format github-annotation-native
+
       - name: Type checks
         run: uv run ty check src
 
@@ -52,9 +55,6 @@ jobs:
 
       - name: Check complexity
         run: uv run complexipy
-
-      - name: Lint SQL
-        run: uv run sqlfluff lint --disable-progress-bar --format github-annotation-native
 
       - name: Test
         run: uv run pytest --inline-snapshot=disable --junitxml=junit/test-results.xml

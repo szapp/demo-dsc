@@ -9,6 +9,7 @@ set default-list
 lint:
     uv run ruff check --fix
     uv run ruff format
+    uv run sqlfluff fix --show-lint-violations
 
 # Check types
 [group('check')]
@@ -35,14 +36,9 @@ check-testdocs:
 check-complexity:
     uv run complexipy
 
-# Lint and format SQL
-[group('check')]
-check-sql:
-    uv run sqlfluff fix --show-lint-violations
-
 # Run linting, formatting, tests and type-checking
 [group('check')]
-check-all: lint test typing check-imports check-testdocs check-complexity check-sql
+check-all: lint test typing check-imports check-testdocs check-complexity
 
 ##############
 # LIFE CYCLE #
@@ -101,6 +97,11 @@ predict *args:
 [group('run')]
 experiment name:
     uv run train +experiment={{ name }}
+
+# Clear data cache
+[group('run')]
+clear-cache:
+    uv run python -c "from project.data import fetch_data; fetch_data.clear()"
 
 ###############
 # DEVELOPMENT #
