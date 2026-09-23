@@ -16,7 +16,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils import estimator_html_repr
 from structlog.contextvars import bind_contextvars, unbind_contextvars
 
-from ..config import make_cli, store
+from ..config import MODEL_REQUIREMENTS, make_cli, store
 from ..types import SqlParams
 from ..version import PACKAGE, SERVICE, VERSION
 
@@ -124,6 +124,7 @@ def train(
             input_example=X.head(),
             signature=infer_signature(X, y),
             registered_model_name=register_model,
+            pip_requirements=MODEL_REQUIREMENTS,
             serialization_format="skops",
             skops_trusted_types=[
                 "numpy.dtype",  # skops-dev/skops/issues/450

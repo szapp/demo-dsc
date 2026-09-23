@@ -40,6 +40,15 @@ def make_column_selector_repr(self):  # pragma: no cover
 
 make_column_selector.__repr__ = make_column_selector_repr
 
+# Model requirements for MLflow must be kept up-to-date with the environment
+MODEL_REQUIREMENTS = (
+    "mlflow==3.16.1",
+    "numpy==2.5.3",
+    "pandas==3.0.6",
+    "scikit-learn==1.9.1",
+    "scipy==1.18.1",
+    "skops==0.15.0",
+)
 
 # Preprocessing step
 preprocessing = builds(
