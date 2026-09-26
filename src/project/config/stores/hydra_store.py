@@ -44,7 +44,7 @@ hydra_store(
             },
             "loggers": {
                 "mlflow": {"handlers": [], "level": "WARNING", "propagate": True},
-                "mlflow.types.type_hints": {"level": "ERROR"},
+                "mlflow.types.type_hints": {"level": "ERROR"},  # TODO remove after upgr
                 "alembic": {"handlers": [], "level": "WARNING", "propagate": True},
                 "sqlalchemy.engine": {"handlers": [], "propagate": True},
             },

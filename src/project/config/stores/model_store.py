@@ -47,7 +47,7 @@ MODEL_REQUIREMENTS = (
     "pandas==3.0.6",
     "scikit-learn==1.9.1",
     "scipy==1.18.1",
-    "skops==0.15.0",
+    "skops==0.16.0",
 )
 
 # Preprocessing step

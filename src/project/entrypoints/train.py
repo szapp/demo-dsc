@@ -3,6 +3,7 @@ import os
 import warnings
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import cast
 
 import mlflow
@@ -86,7 +87,11 @@ def train(
     Returns:
         The score of the evaluated fit.
     """
-    extra = {"training_cutoff": str(training_cutoff), "num_days": num_days}
+    extra = {
+        "training_cutoff": str(training_cutoff),
+        "num_days": num_days,
+        "outputs": str(Path.cwd()),
+    }
     logger.info("Start", extra=extra)
     ENV = os.environ.get("ENV")
     warnings.filterwarnings("once", r".*at_least_one_value", SchemaWarning)
