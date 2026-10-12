@@ -92,20 +92,14 @@ extend-exclude = [
 
 [tool.ruff.lint]
 extend-select = [
-    "I",     # organize-imports
-    "E501",  # line-too-long
-    "UP006", # non-pep585-annotation
-    "UP035", # deprecated-import
-    "D200",  # unnecessary-multiline-docstring
-    "D209",  # new-line-after-last-paragraph
-    "D210",  # surrounding-whitespace
-    "D212",  # multi-line-summary-first-line
-    "D403",  # first-word-capitalized
-    "D405",  # non-capitalized-section-name
-    "D416",  # missing-section-name-colon
-]
-ignore = [
-    "E731", # lambda-assignment
+    "E501", # line-too-long
+    "D200", # unnecessary-multiline-docstring
+    "D209", # new-line-after-last-paragraph
+    "D210", # surrounding-whitespace
+    "D212", # multi-line-summary-first-line
+    "D403", # first-word-capitalized
+    "D405", # non-capitalized-section-name
+    "D416", # missing-section-name-colon
 ]
 
 [tool.ruff.lint.per-file-ignores]

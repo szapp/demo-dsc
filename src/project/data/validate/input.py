@@ -24,7 +24,7 @@ class RawDataModel(DataModelBase):
     col3: pd.BooleanDtype = F(nullable=True)
     col4: Annotated[pd.CategoricalDtype, _CAT, False] = F(nullable=True)
 
-    class Config:
+    class Config(DataModelBase.Config):  # ty: ignore[invalid-attribute-override]
         unique = ["id", "date"]  # noqa: RUF012
 
 

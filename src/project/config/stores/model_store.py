@@ -33,8 +33,12 @@ model_store(
 
 
 # Improve representation of make_column_selector for run comparisons in MLflow
-def make_column_selector_repr(self):  # pragma: no cover
-    param_pairs = [f"{k}={v!r}" for k, v in self.__dict__.items() if v is not None]
+def make_column_selector_repr(self):
+    param_pairs = [
+        f"{k}={v!r}"
+        for k, v in self.__dict__.items()
+        if v is not None and k.strip("_") == k
+    ]
     return f"{type(self).__name__}({', '.join(param_pairs)})"
 
 
@@ -42,8 +46,8 @@ make_column_selector.__repr__ = make_column_selector_repr
 
 # Model requirements for MLflow must be kept up-to-date with the environment
 MODEL_REQUIREMENTS = (
-    "mlflow==3.16.1",
-    "numpy==2.5.3",
+    "mlflow==3.17.0",
+    "numpy==2.5.4",
     "pandas==3.0.6",
     "scikit-learn==1.9.1",
     "scipy==1.18.1",

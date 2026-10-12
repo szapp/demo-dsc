@@ -17,7 +17,7 @@ class DataModelBase(pa.DataFrameModel):
 
     index_: pat.Index[int] = F(unique=True, ge=0)  # Force generic DataFrame index
 
-    class Config:
+    class Config:  # ty: ignore[invalid-attribute-override]
         strict = "filter"  # Drop extra columns
         coerce = True  # Auto-convert data types where possible
 
