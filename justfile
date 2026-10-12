@@ -98,6 +98,11 @@ predict *args:
 experiment name:
     uv run train +experiment={{ name }}
 
+# Multirun an experiment
+[group('run')]
+experiment-multi name:
+    uv run train +experiment={{ name }} -m
+
 # Clear data cache
 [group('run')]
 clear-cache:

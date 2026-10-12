@@ -2,6 +2,7 @@
 
 __all__ = [
     "store",
+    "whitelist",
 ]
 
 from hydra_zen import store
@@ -14,3 +15,4 @@ from . import (  # noqa: F401
     model_store,
     validator_store,
 )
+from .util import whitelist

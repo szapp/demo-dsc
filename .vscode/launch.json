@@ -64,7 +64,8 @@
             "preLaunchTask": "Sync uv",
             "program": "${workspaceFolder}/.venv/bin/train",
             "args": [
-                "+experiment=${input:experiment_name}"
+                "+experiment=${input:experiment_name}",
+                "${input:experiment_mode}"
             ],
             "cwd": "${workspaceFolder}",
             "env": {
@@ -81,7 +82,17 @@
             "id": "experiment_name",
             "type": "promptString",
             "description": "Name of experiment configuration.",
-            "default": "example"
+            "default": "example_multi"
+        },
+        {
+            "id": "experiment_mode",
+            "type": "pickString",
+            "options": [
+                "--run",
+                "--multirun"
+            ],
+            "description": "Run single experiment or multirun.",
+            "default": "--multirun"
         }
     ]
 }

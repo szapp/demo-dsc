@@ -25,7 +25,7 @@ hydra_store(
         ),
         sweep=SweepDir(
             dir="${hydra.run.dir}",
-            subdir="${hydra.job.num}-${hydra.job.override_dirname}",
+            subdir="${hydra.job.num}-${hydra_override_dirname:}",
         ),
         job=JobConf(
             chdir=True,
