@@ -5,11 +5,14 @@ from typing import Any, Literal
 
 from hydra_zen import make_custom_builds_fn
 
+from ...version import PACKAGE
+
 __all__ = [
     "build_columns",
     "build_steps",
     "build_transformers",
     "builds",
+    "whitelist",
 ]
 
 
@@ -43,3 +46,21 @@ builds = make_custom_builds_fn(populate_full_signature=True, hydra_convert="obje
 build_steps = partial(builds, _make_steps)
 build_transformers = partial(builds, _make_transformers)
 build_columns = partial(builds, _make_columns)
+whitelist = (
+    "auto",
+    f"{PACKAGE}.*",
+    "sklearn.*",
+    "structlog.processors.*",
+    "structlog.dev.ConsoleRenderer",
+    "structlog.stdlib.ExtraAdder",
+    "structlog.stdlib.PositionalArgumentsFormatter",
+    "structlog.stdlib.ProcessorFormatter",
+    "structlog.stdlib.ProcessorFormatter.*",
+    "structlog.stdlib.add_logger_name",
+    "structlog.stdlib.add_log_level",
+    "structlog.contextvars.merge_contextvars",
+    "logging.handlers.RotatingFileHandler",
+    "hydra_structlog.formatters.*",
+    "hydra_structlog.processors.*",
+    "hydra_structlog.handlers.*",
+)

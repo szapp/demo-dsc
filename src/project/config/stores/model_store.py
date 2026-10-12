@@ -10,7 +10,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from ...version import SERVICE
-from .util import build_columns, build_steps, build_transformers, builds
+from .util import build_columns, build_steps, build_transformers, builds, whitelist
 
 __all__ = [
     "make_model",
@@ -21,7 +21,8 @@ model_store = store(group="model")
 
 def make_model(name: str = "prod") -> Pipeline:
     """Instantiate an ML model from the model config store for use in notebooks."""
-    return instantiate(model_store.get_entry(group="model", name=name)["node"])
+    node = model_store.get_entry(group="model", name=name)["node"]
+    return instantiate(node, _execution_whitelist_=whitelist)
 
 
 model_store(

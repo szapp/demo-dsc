@@ -5,7 +5,7 @@ from hydra_zen import instantiate, store
 from sqlalchemy import URL, Engine
 from sqlalchemy import create_engine as sa_create_engine
 
-from .util import builds
+from .util import builds, whitelist
 
 __all__ = [
     "create_engine",
@@ -19,7 +19,8 @@ db_store = store(group="db")
 def make_db_engine(name: str) -> Engine:
     """Instantiate an SQLAlchemy Engine from the DB store for use in notebooks."""
     load_dotenv()  # Load secrets
-    return instantiate(db_store.get_entry(group="db", name=name)["node"])
+    node = db_store.get_entry(group="db", name=name)["node"]
+    return instantiate(node, _execution_whitelist_=whitelist)
 
 
 def create_engine(url: URL | str, pool_recycle: int = -1) -> Engine:

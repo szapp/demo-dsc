@@ -7,7 +7,7 @@ from dotenv import find_dotenv, load_dotenv
 from hydra_zen import zen
 from hydra_zen.third_party.pydantic import pydantic_parser
 
-from .stores import store
+from .stores import store, whitelist
 
 CONFIG_PATH = str(Path("config").resolve())  # Absolute path from CWD
 
@@ -23,6 +23,6 @@ def make_cli(func: Callable[..., Any]) -> Callable[[], None]:  # pragma: no cove
         config_path = "." if config_name in {"test", "prod"} else CONFIG_PATH
         store.add_to_hydra_store()
         entrypoint = zen(func, instantiation_wrapper=pydantic_parser)
-        entrypoint.hydra_main(config_path, config_name, version_base=None)
+        entrypoint.hydra_main(config_path, config_name, execution_whitelist=whitelist)
 
     return cli
