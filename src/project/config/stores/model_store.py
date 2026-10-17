@@ -46,7 +46,7 @@ make_column_selector.__repr__ = make_column_selector_repr
 
 # Model requirements for MLflow must be kept up-to-date with the environment
 MODEL_REQUIREMENTS = (
-    "mlflow==3.17.0",
+    "mlflow==3.17.1",
     "numpy==2.5.4",
     "pandas==3.0.6",
     "scikit-learn==1.9.1",
