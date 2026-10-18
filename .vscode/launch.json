@@ -25,6 +25,7 @@
             "request": "launch",
             "console": "integratedTerminal",
             "justMyCode": false,
+            "preLaunchTask": "Sync uv",
             "program": "${workspaceFolder}/.venv/bin/train",
             "args": [],
             "cwd": "${workspaceFolder}",
@@ -42,6 +43,7 @@
             "request": "launch",
             "console": "integratedTerminal",
             "justMyCode": false,
+            "preLaunchTask": "Sync uv",
             "program": "${workspaceFolder}/.venv/bin/predict",
             "args": [],
             "cwd": "${workspaceFolder}",
@@ -59,6 +61,7 @@
             "request": "launch",
             "console": "integratedTerminal",
             "justMyCode": false,
+            "preLaunchTask": "Sync uv",
             "program": "${workspaceFolder}/.venv/bin/train",
             "args": [
                 "+experiment=${input:experiment_name}"

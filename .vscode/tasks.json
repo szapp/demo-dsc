@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            // Serves as preLaunchTask for debug sessions in launch.json
+            "label": "Sync uv",
+            "type": "process",
+            "command": "uv",
+            "args": [
+                "sync"
+            ],
+            "group": "none",
+            "hide": true,
+            "presentation": {
+                "reveal": "silent",
+                "echo": false,
+                "close": true,
+                "showReuseMessage": false,
+                "preserveTerminalName": false,
+            }
+        }
+    ]
+}

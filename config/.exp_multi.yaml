@@ -6,8 +6,6 @@ experiment:
 run_name: ${hydra:sweep.subdir}
 hydra:
   mode: MULTIRUN
-  sweep:
-    subdir: ${hydra.job.num}-${hydra.job.override_dirname}
   job:
     config:
       override_dirname:
@@ -15,7 +13,7 @@ hydra:
           - experiment
   callbacks:
     parent_run:
-      _target_: project.config.ParentRunCallback
+      _target_: project.config.callbacks.ParentRunCallback
       name: ${oc.select:experiment.name,${hydra.job.name}-${hydra.job.config_name}_${now:%Y%m%d}_${now:%H%M%S}}
       description: ${experiment.description}
   sweeper:

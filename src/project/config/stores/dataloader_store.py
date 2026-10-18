@@ -13,11 +13,7 @@ dataloader_store = store(group="dataloader")
 dataloader_store(
     data.fetch_data,
     zen_partial=True,
-    db_engine=None,
     sql_queries=builds(data.load_sql_files),  # Lazy loading
-    hydra_defaults=[
-        "_self_",
-        {"/db@db_engine": "memory"},
-    ],
+    hydra_defaults=[{"/db@db_engine": "memory"}],
     name="prod",
 )

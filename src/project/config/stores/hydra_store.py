@@ -23,7 +23,10 @@ hydra_store(
                 "${now:%Y-%m-%d}/${now:%H-%M-%S}"
             )
         ),
-        sweep=SweepDir(dir="${hydra.run.dir}"),
+        sweep=SweepDir(
+            dir="${hydra.run.dir}",
+            subdir="${hydra.job.num}-${hydra.job.override_dirname}",
+        ),
         job=JobConf(
             chdir=True,
             env_set={
