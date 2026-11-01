@@ -13,7 +13,7 @@
             "console": "internalConsole",
             "justMyCode": false,
             "presentation": {
-                "hidden": true, // Only for tests inline
+                "hidden": true // Only for tests inline
             },
             "env": {
                 "PYTEST_ADDOPTS": "--no-cov" // Coverage prevents debugging
@@ -31,7 +31,7 @@
             "cwd": "${workspaceFolder}",
             "env": {
                 "PYTHONUNBUFFERED": "1",
-                "ENV": "dev",
+                "ENV": "dev"
             },
             "windows": {
                 "program": "${workspaceFolder}/.venv/Scripts/train.exe"
@@ -49,7 +49,7 @@
             "cwd": "${workspaceFolder}",
             "env": {
                 "PYTHONUNBUFFERED": "1",
-                "ENV": "dev",
+                "ENV": "dev"
             },
             "windows": {
                 "program": "${workspaceFolder}/.venv/Scripts/predict.exe"
@@ -69,7 +69,7 @@
             "cwd": "${workspaceFolder}",
             "env": {
                 "PYTHONUNBUFFERED": "1",
-                "ENV": "dev",
+                "ENV": "dev"
             },
             "windows": {
                 "program": "${workspaceFolder}/.venv/Scripts/train.exe"

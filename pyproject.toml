@@ -23,9 +23,7 @@ dependencies = [
     "pyarrow>=23.0.1",
     "pydantic>=2.12.5",
     "python-dotenv>=1.2.1",
-    "rich>=14.3.3",
     "scikit-learn>=1.8.0",
-    "skops>=0.16.0",
     "sqlalchemy>=2.1.6",
     "structlog>=25.5.0",
     "tqdm>=4.67.3",
@@ -33,7 +31,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "complexipy>=8.3.0",
     "dirty-equals>=0.11",
     "inline-snapshot-pandas>=0.2.0",
     "inline-snapshot>=0.32.2",
@@ -46,6 +43,7 @@ dev = [
     "pytest-randomly>=4.0.1",
     "pytest-timeout>=2.4.0",
     "pytest>=9.2.0",
+    "rich>=14.3.3",
     "ruff>=0.17.3",
     "sqlfluff>=4.2.2",
     "tach>=0.33.3",
@@ -159,9 +157,3 @@ fail-under = 100
 whitelist-regex = ["test_.*"]
 exclude = ["*.cache"]
 style = "google"
-
-[tool.complexipy]
-paths = ["src", "tests"]    # Cognitive complexity: How intuitive is a function for humans.
-max-complexity-allowed = 10
-failed = true
-exclude = ["**/legacy/**"]

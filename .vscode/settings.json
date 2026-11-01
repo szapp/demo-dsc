@@ -29,7 +29,7 @@
     "notebook.formatOnCellExecution": true,
     "notebook.codeActionsOnSave": {
         "notebook.source.fixAll": "explicit",
-        "notebook.source.organizeImports": "explicit",
+        "notebook.source.organizeImports": "explicit"
     },
     "notebook.lineNumbers": "on",
     "notebook.cellExecutionTimeVerbosity": "verbose",
@@ -37,7 +37,7 @@
         "editor.lineNumbers": "on",
         "editor.rulers": [
             88
-        ],
+        ]
     },
     "files.trimTrailingWhitespace": true,
     "files.trimFinalNewlines": true,
@@ -48,34 +48,33 @@
         ".venv/**/*": true,
         "**/dist/**/*": true,
         ".python-version": true,
-        "notebooks/template.ipynb": true,
+        "notebooks/template.ipynb": true
     },
     "files.exclude": {
         ".ruff_cache": true,
         ".pytest_cache": true,
         ".coverage*": true,
-        ".complexipy_cache": true,
         "**/__pycache__": true,
         "**/.ipynb_checkpoints": true,
         "**/mlruns": true,
-        "**/~*.xlsx": true,
+        "**/~*.xlsx": true
     },
     "workbench.editorAssociations": {
         "file:/**/*.md": "vscode.markdown.preview.editor",
         "file:/**/*.parquet": "jupyter-data-wrangler",
         "file:/**/*.xlsx": "jupyter-data-wrangler",
-        "file:/**/*.csv": "jupyter-data-wrangler",
+        "file:/**/*.csv": "jupyter-data-wrangler"
     },
     "[python]": {
         "editor.codeActionsOnSave": {
             "source.fixAll": "explicit",
-            "source.organizeImports": "explicit",
+            "source.organizeImports": "explicit"
         },
         "editor.defaultFormatter": "charliermarsh.ruff",
         "editor.formatOnSave": true,
         "editor.rulers": [
             88
-        ],
+        ]
     },
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features",
@@ -150,6 +149,6 @@
         },
         "editor.rulers": [
             120
-        ],
-    },
+        ]
+    }
 }

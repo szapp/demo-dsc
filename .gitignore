@@ -17,7 +17,6 @@
 *.log*
 catboost_info/
 /prof/
-/.complexipy_cache/
 
 # OS files
 __MACOSX/

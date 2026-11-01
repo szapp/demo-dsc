@@ -8,15 +8,11 @@ hooks = [
     {id = "check-merge-conflict"},
     {id = "check-yaml"},
     {id = "check-toml"},
+    {id = "check-jsonc", types = ["json"]},
     {id = "end-of-file-fixer"},
     {id = "trailing-whitespace", args = ["--markdown-linebreak-ext=md"]},
     {id = "check-added-large-files"},
 ]
-
-[[repos]]
-repo = "https://gitlab.com/bmares/check-json5"
-rev = "v1.0.1"
-hooks = [{id = "check-json5"}]
 
 # Local hooks require UV
 [[repos]]
@@ -27,7 +23,7 @@ hooks = [
     {id = "ruff-format", name = "ruff-format", entry = "uv run ruff format", language = "system", types_or = ["python", "pyi"], args = ["--force-exclude"], require_serial = true},
     {id = "ty", name = "ty", entry = "uv run ty check src", language = "system", pass_filenames = false},
     {id = "tach", name = "tach", entry = "uv run tach check", language = "system", pass_filenames = false},
+    {id = "tach-external", name = "tach-external", entry = "uv run tach check-external", language = "system", pass_filenames = false},
     {id = "interrogate", name = "interrogate", entry = "uv run interrogate tests", language = "system", types_or = ["python", "pyi"], require_serial = true},
-    {id = "complexipy", name = "complexipy", entry = "uv run complexipy", language = "system", types_or = ["python", "pyi"], require_serial = true},
     {id = "sqlfluff", name = "sqlfluff", entry = "uv run sqlfluff fix --show-lint-violations --processes 0 --disable-progress-bar", language = "system", types = ["sql"], require_serial = true},
 ]

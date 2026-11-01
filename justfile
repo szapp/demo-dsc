@@ -25,20 +25,16 @@ test *args:
 [group('check')]
 check-imports:
     uv run tach check
+    uv run tach check-external
 
 # Check docstrings on tests
 [group('check')]
 check-testdocs:
     uv run interrogate tests
 
-# Check cognitive complexity
-[group('check')]
-check-complexity:
-    uv run complexipy
-
 # Run linting, formatting, tests and type-checking
 [group('check')]
-check-all: lint test typing check-imports check-testdocs check-complexity
+check-all: lint test typing check-imports check-testdocs
 
 ##############
 # LIFE CYCLE #

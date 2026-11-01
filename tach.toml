@@ -7,6 +7,7 @@ exclude = [
     "**/venv",
 ]
 forbid_circular_dependencies = true
+exact = true
 
 # Architecture layers can only import from below
 layers = [
@@ -14,6 +15,22 @@ layers = [
     "config",
     "business_logic",
 ]
+
+[external]
+exclude = [
+    "hydra_colorlog",
+    "hydra_optuna_sweeper",
+    "hydra_structlog",
+    "rich",
+    "pip",
+    "psycopg2_binary",
+    "pyarrow",
+]
+
+[rules]
+unused_ignore_directives = "error"
+require_ignore_directive_reasons = "error"
+unused_external_dependencies = "error"
 
 # Data can only be fetched through the interface
 [[interfaces]]
