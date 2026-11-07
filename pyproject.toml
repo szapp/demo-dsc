@@ -4,7 +4,7 @@ version = "0" # Controlled by environment variable
 classifiers = ["Private :: Do Not Upload"]
 requires-python = "==3.14.*" # Controlled by .python-version
 dependencies = [
-    "frozendict>=2.4.7",
+    "frozendict>=2.5.1",
     "hydra-colorlog>=1.2.0",
     "hydra-core>=1.4.0rc3",
     "hydra-optuna-sweeper>=1.2.0",
@@ -12,19 +12,19 @@ dependencies = [
     "hydra-zen>=0.17.2",
     "joblib-typed-cache>=0.1.0",
     "joblib>=1.5.3",
-    "mlflow>=3.17.2",
+    "mlflow>=3.18.0",
     "numpy>=2.4.2",
     "omegaconf>=2.4.0",
     "optuna>=4.7.0",
     "pandas>=3.1.0",
     "pandera[pandas]>=0.35.0",
-    "pip>=26.2.2",
+    "pip>=26.3",
     "psycopg2-binary>=2.9.11",
-    "pyarrow>=23.0.1",
-    "pydantic>=2.12.5",
+    "pyarrow>=26.0.1",
+    "pydantic>=2.14.2",
     "python-dotenv>=1.2.1",
     "scikit-learn>=1.8.0",
-    "sqlalchemy>=2.1.6",
+    "sqlalchemy>=2.1.8",
     "structlog>=25.5.0",
     "tqdm>=4.67.3",
 ]
@@ -35,7 +35,7 @@ dev = [
     "inline-snapshot-pandas>=0.2.0",
     "inline-snapshot>=0.32.2",
     "interrogate>=1.7.0",
-    "prek>=0.5.7",
+    "prek>=0.5.10",
     "pytest-cov>=7.0.0",
     "pytest-mock>=3.17.0",
     "pytest-profiling>=1.8.1",
@@ -45,13 +45,13 @@ dev = [
     "pytest>=9.2.0",
     "rich>=14.3.3",
     "ruff>=0.17.3",
-    "sqlfluff>=4.2.2",
+    "sqlfluff>=4.5.0",
     "tach>=0.33.3",
-    "ty>=0.0.93",
+    "ty>=0.0.96",
 ]
 notebook = [
     "ipytest>=0.14.2",
-    "ipython>=9.11.0",
+    "ipython>=9.18.1",
     "ipywidgets>=8.1.8",
     "jupyter>=1.1.1",
     "matplotlib>=3.10.8",
@@ -74,7 +74,7 @@ override-dependencies = [
 ]
 
 [build-system]
-requires = ["uv_build>=0.13.6,<0.14"]
+requires = ["uv_build>=0.13.7,<0.14"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
