@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 env:
   UV_LOCKED: true
   UV_NO_DEFAULT_GROUPS: true
@@ -17,8 +20,6 @@ jobs:
   ci:
     name: Lint and test
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: Checkout
