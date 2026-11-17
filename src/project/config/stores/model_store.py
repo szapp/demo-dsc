@@ -48,7 +48,7 @@ make_column_selector.__repr__ = make_column_selector_repr
 MODEL_REQUIREMENTS = (
     "mlflow==3.18.0",
     "numpy==2.5.4",
-    "pandas==3.1.0",
+    "pandas==3.1.1",
     "scikit-learn==1.9.1",
     "scipy==1.18.1",
     "skops==0.16.0",

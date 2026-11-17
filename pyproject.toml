@@ -33,7 +33,7 @@ dependencies = [
 dev = [
     "dirty-equals>=0.11",
     "inline-snapshot-pandas>=0.2.0",
-    "inline-snapshot>=0.36.2",
+    "inline-snapshot>=0.36.1,!=0.36.2",
     "interrogate>=1.7.0",
     "prek>=0.5.10",
     "pytest-cov>=7.0.0",
