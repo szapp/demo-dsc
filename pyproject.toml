@@ -72,6 +72,7 @@ default-groups = [
 override-dependencies = [
     "optuna>=2.10.0",
 ]
+exclude-newer = "3 days"
 
 [build-system]
 requires = ["uv_build>=0.13.8,<0.14"]
